@@ -47,7 +47,10 @@ func _process(delta):
 	self.z_index = (tile_pos.x + tile_pos.y) + 1
 	
 	#A star
-	get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
+	if self.is_in_group("dead"):
+		pass
+	else:
+		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
 func get_closest_attack():
 	var all_players = get_tree().get_nodes_in_group("zombies")
