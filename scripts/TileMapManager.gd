@@ -10,6 +10,7 @@ var rng = RandomNumberGenerator.new()
 @export var zombie: Area2D
 
 var astar_grid = AStarGrid2D.new()
+var zombies = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -23,11 +24,12 @@ func _process(delta):
 	astar_grid.update()
 
 func zombie_attack_ai():
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	var active_zombie = rng.randi_range(0,15)
-	var target_zombie = rng.randi_range(0,15)			
-	if !zombies[active_zombie].is_in_group("dead") and !zombies[target_zombie].is_in_group("dead"):										
-		var zombie_target_pos = local_to_map(zombies[target_zombie].position)
+	zombies = get_tree().get_nodes_in_group("zombies")
+	var active_zombie = rng.randi_range(0,zombies.size()-1)
+	var target_zombie = rng.randi_range(0,zombies.size()-1)			
+	if !zombies[active_zombie].is_in_group("dead") and !zombies[target_zombie].is_in_group("dead"):
+		var closest_atack = zombies[active_zombie].get_closest_attack()										
+		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
 		
 		zombies[active_zombie].get_child(0).play("move")
@@ -69,20 +71,18 @@ func zombie_attack_ai():
 		
 			zombies[active_zombie].get_child(0).play("attack")
 			var tween: Tween = create_tween()
-			tween.tween_property(zombies[target_zombie], "modulate:v", 1, 0.50).from(5)			
+			tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
 			await get_tree().create_timer(1).timeout
+			closest_atack.get_child(0).play("death")	
+			await get_tree().create_timer(1).timeout
+			closest_atack.add_to_group("dead")
+			closest_atack.remove_from_group("zombies")
 			zombies[active_zombie].get_child(0).play("default")
-			zombies[target_zombie].get_closest_attack().get_child(0).play("death")	
-			zombies[target_zombie].add_to_group("dead")
 			
-			zombie_attack_ai()
-			
-		else:
-			zombie_attack_ai()		
-	else:
-		var dead_zombies = get_tree().get_nodes_in_group("dead")
-		if dead_zombies.size() >= 15:
-			return
+			if zombies.size() <= 2:
+				return
+			else:
+				zombie_attack_ai()
 		else:
 			zombie_attack_ai()
 		
