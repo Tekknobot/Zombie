@@ -11,6 +11,7 @@ var open_tiles = []
 var random = []
 
 var zombie = preload("res://scenes/sprites/zombie.scn")
+var dog = preload("res://scenes/sprites/dog.scn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -21,7 +22,7 @@ func _ready():
 func _process(delta):
 	pass
 
-func spawn_zombies():
+func spawn():
 	# Find open tiles
 	open_tiles.clear()	
 	for i in 16:
@@ -33,7 +34,7 @@ func spawn_zombies():
 	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop zombies at start	
-	for i in 4:	
+	for i in 8:	
 		var zomb = zombie.instantiate()
 		node2D.add_child(zomb)
 		zomb.add_to_group("zombies")			
@@ -44,7 +45,29 @@ func spawn_zombies():
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
 		await get_tree().create_timer(0.5).timeout
 									
+	# Find open tiles again
+	open_tiles.clear()	
+	for i in 16:
+		for j in 16:
+			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:			
+				open_tiles.append(Vector2i(i,j))
+	
+	random.clear()
+	random = get_random_numbers(0, open_tiles.size())
 
+	# Drop dogs at start	
+	for i in 1:	
+		var dog_inst = dog.instantiate()
+		node2D.add_child(dog_inst)
+		dog_inst.add_to_group("dogs")			
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		dog_inst.position = Vector2(new_position.x, new_position.y-500)
+		var tween: Tween = create_tween()
+		tween.tween_property(dog_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
+		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
+		await get_tree().create_timer(0).timeout
+	
+	await get_tree().create_timer(1).timeout	
 	
 func get_random_numbers(from, to):
 	var arr = []
@@ -55,5 +78,5 @@ func get_random_numbers(from, to):
 
 
 func _on_spawn_button_pressed():
-	await spawn_zombies()
-	get_node("../TileMap").zombie_attack_ai()
+	await spawn()
+	get_node("../TileMap").dog_attack_ai()

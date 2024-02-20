@@ -52,7 +52,7 @@ func _process(delta):
 	else:
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
-func get_closest_attack():
+func get_closest_attack_zombies():
 	self.remove_from_group("zombies")
 	var all_players = get_tree().get_nodes_in_group("zombies")
 	var closest_player = null
