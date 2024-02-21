@@ -34,7 +34,7 @@ func spawn():
 	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop zombies at start	
-	for i in 8:	
+	for i in 16:	
 		var zomb = zombie.instantiate()
 		node2D.add_child(zomb)
 		zomb.add_to_group("zombies")			

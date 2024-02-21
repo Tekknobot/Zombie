@@ -36,7 +36,7 @@ func dog_attack_ai():
 		
 		dogs[active_dog].get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
-		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false: 
+		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1: 
 			var patharray = astar_grid.get_point_path(dogs[active_dog].tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
