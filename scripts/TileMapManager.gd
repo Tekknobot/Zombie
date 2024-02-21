@@ -78,9 +78,11 @@ func _input(event):
 			var tile_data = get_cell_tile_data(0, tile_pos)
 			humans = get_tree().get_nodes_in_group("humans")
 			zombies = get_tree().get_nodes_in_group("zombies")
+			dogs = get_tree().get_nodes_in_group("dogs")
 			
 			all_units.append_array(humans)
 			all_units.append_array(zombies)
+			all_units.append_array(dogs)
 			
 			for i in all_units.size():
 				if all_units[i].unit_type == "Human":
@@ -97,7 +99,12 @@ func _input(event):
 						if unit_pos == tile_pos:					
 							show_zombie_movement_range()
 								
-
+				if all_units[i].unit_type == "Dog":		
+					#Place hover tiles		
+					for j in dogs.size():
+						var unit_pos = local_to_map(dogs[j].position)
+						if unit_pos == tile_pos:					
+							show_dog_movement_range()
 
 func dog_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -589,3 +596,24 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-3), 10, Vector2i(0, 0), 0)															
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
+
+func show_dog_movement_range():
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	var mouse_pos = get_global_mouse_position()
+	mouse_pos.y += 8
+	var tile_pos = local_to_map(mouse_pos)	
+	var tile_data = get_cell_tile_data(0, tile_pos)
+	humans = get_tree().get_nodes_in_group("humans")
+	
+	#Place hover tiles		
+	for i in dogs.size():
+		var unit_pos = local_to_map(dogs[i].position)
+		if unit_pos == tile_pos:
+			#Place hover tiles on all tiles										
+			for j in grid_height:
+				for k in grid_width:
+					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
