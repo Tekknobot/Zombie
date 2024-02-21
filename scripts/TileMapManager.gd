@@ -13,6 +13,8 @@ var zombies = []
 var dogs = []
 var humans = []
 
+var all_units = []
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -70,7 +72,31 @@ func _process(delta):
 func _input(event):
 	if event is InputEventMouseButton:			
 		if event.button_index == MOUSE_BUTTON_LEFT:	
-			show_zombie_movement_range()				
+			var mouse_pos = get_global_mouse_position()
+			mouse_pos.y += 8
+			var tile_pos = local_to_map(mouse_pos)	
+			var tile_data = get_cell_tile_data(0, tile_pos)
+			humans = get_tree().get_nodes_in_group("humans")
+			zombies = get_tree().get_nodes_in_group("zombies")
+			
+			all_units.append_array(humans)
+			all_units.append_array(zombies)
+			
+			for i in all_units.size():
+				if all_units[i].unit_type == "Human":
+					#Place hover tiles		
+					for j in humans.size():
+						var unit_pos = local_to_map(humans[j].position)
+						if unit_pos == tile_pos:
+							show_humans_movement_range()
+							
+				if all_units[i].unit_type == "Zombie":		
+					#Place hover tiles		
+					for j in zombies.size():
+						var unit_pos = local_to_map(zombies[j].position)
+						if unit_pos == tile_pos:					
+							show_zombie_movement_range()
+								
 
 
 func dog_attack_ai():
@@ -148,6 +174,9 @@ func humans_attack_ai():
 			for h in patharray.size():
 				await get_tree().create_timer(0.01).timeout
 				set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)
+				if h == humans[active_humans].unit_movement:
+					get_node("../TileMap").set_cell(1, patharray[h], 18, Vector2i(0, 0), 0)			
+									
 			# Move unit		
 			for h in patharray.size():
 				var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
@@ -156,6 +185,8 @@ func humans_attack_ai():
 				var unit_pos = local_to_map(humans[active_humans].position)
 				humans[active_humans].z_index = unit_pos.x + unit_pos.y			
 				await get_tree().create_timer(0.25).timeout		
+				if h == humans[active_humans].unit_movement:
+					break								
 			
 			# Remove hover cells
 			for h in patharray.size():
@@ -176,14 +207,15 @@ func humans_attack_ai():
 					elif humans[active_humans].scale.x == 1 and humans[active_humans].position.x < attack_center_pos.x:
 						humans[active_humans].scale.x = -1						
 		
-			humans[active_humans].get_child(0).play("attack")
-			var tween: Tween = create_tween()
-			tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
-			await get_tree().create_timer(1).timeout
-			closest_atack.get_child(0).play("death")
-			humans[active_humans].get_child(0).play("default")	
-			closest_atack.add_to_group("dead")
-			closest_atack.remove_from_group("zombies")		
+					humans[active_humans].get_child(0).play("attack")
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
+					await get_tree().create_timer(1).timeout
+					closest_atack.get_child(0).play("death")
+					humans[active_humans].get_child(0).play("default")	
+					closest_atack.add_to_group("dead")
+					closest_atack.remove_from_group("zombies")	
+					break	
 			
 func zombie_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -251,13 +283,25 @@ func zombie_attack_ai():
 			
 func _on_zombie_button_pressed():
 	zombie_attack_ai()
-
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			
 func _on_dog_button_pressed():
 	dog_attack_ai()
-	
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+				
 func _on_soldier_button_pressed():
 	humans_attack_ai()	
-
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			
 func show_zombie_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -353,6 +397,150 @@ func show_zombie_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+2), 10, Vector2i(0, 0), 0)			
 
 				if zombies[i].unit_movement == 5:
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)									
+						if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 10, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 10, Vector2i(0, 0), 0)															
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 10, Vector2i(0, 0), 0)	
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 10, Vector2i(0, 0), 0)	
+															
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y+2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-2), 10, Vector2i(0, 0), 0)															
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+2), 10, Vector2i(0, 0), 0)	
+
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y+3), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-3, unit_pos.y-2), 10, Vector2i(0, 0), 0)															
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y-3), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-3, unit_pos.y+2), 10, Vector2i(0, 0), 0)	
+
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y+2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-3), 10, Vector2i(0, 0), 0)															
+					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
+
+func show_humans_movement_range():
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	var mouse_pos = get_global_mouse_position()
+	mouse_pos.y += 8
+	var tile_pos = local_to_map(mouse_pos)	
+	var tile_data = get_cell_tile_data(0, tile_pos)
+	humans = get_tree().get_nodes_in_group("humans")
+	
+	#Place hover tiles		
+	for i in humans.size():
+		var unit_pos = local_to_map(humans[i].position)
+		if unit_pos == tile_pos:
+			for j in humans[i].unit_movement:
+				
+				var surrounding_cells = get_node("../TileMap").get_surrounding_cells(unit_pos)
+				
+				if humans[i].unit_movement == 1:
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)
+						if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)										
+				
+				if humans[i].unit_movement == 2:
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)										
+						if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 10, Vector2i(0, 0), 0)									
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)	
+				
+				if humans[i].unit_movement == 3:
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)									
+						if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 10, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 10, Vector2i(0, 0), 0)						
+
+				if humans[i].unit_movement == 4:
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)									
+						if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 10, Vector2i(0, 0), 0)								
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 10, Vector2i(0, 0), 0)															
+					for k in surrounding_cells.size():
+						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+						set_cell(1, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)															
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 10, Vector2i(0, 0), 0)																																								
+						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 10, Vector2i(0, 0), 0)	
+						
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y+2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-2), 10, Vector2i(0, 0), 0)															
+					set_cell(1, Vector2i(unit_pos.x+2, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
+					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+2), 10, Vector2i(0, 0), 0)			
+
+				if humans[i].unit_movement == 5:
 					for k in surrounding_cells.size():
 						set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 						set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 10, Vector2i(0, 0), 0)									

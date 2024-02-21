@@ -12,6 +12,7 @@ var moving : bool
 var tile_pos
 
 @export var unit_movement: int
+@export var unit_type: String
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
