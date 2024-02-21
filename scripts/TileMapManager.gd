@@ -154,7 +154,7 @@ func _input(event):
 					for j in dogs.size():
 						var unit_pos = local_to_map(dogs[j].position)
 						if unit_pos == tile_pos:					
-							show_dog_movement_range()
+							show_dog_movement_range()						
 
 func dog_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -364,6 +364,11 @@ func show_zombie_movement_range():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			
+	#Defualt animations
+	for i in user_units.size():
+		if user_units[i].unit_num == 1 or user_units[i].unit_num == 2  or user_units[i].unit_num == 3:
+			user_units[i].get_child(0).play("default")
 	
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
@@ -508,6 +513,10 @@ func show_humans_movement_range():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+
+	for i in user_units.size():
+		if user_units[i].unit_num == 3:
+			user_units[i].get_child(0).play("default")
 	
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
@@ -652,6 +661,10 @@ func show_dog_movement_range():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+
+	for i in user_units.size():
+		if user_units[i].unit_num == 1 or user_units[i].unit_num == 2:
+			user_units[i].get_child(0).play("default")
 	
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
