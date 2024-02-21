@@ -14,6 +14,14 @@ var dogs = []
 var humans = []
 
 var all_units = []
+var user_units = []
+
+var selected_unit
+var selected_pos = Vector2i(0,0);
+var target_pos = Vector2i(0,0);
+var selected_unit_num
+
+var moving = false
 
 
 # Called when the node enters the scene tree for the first time.
@@ -83,7 +91,49 @@ func _input(event):
 			all_units.append_array(humans)
 			all_units.append_array(zombies)
 			all_units.append_array(dogs)
+
+			user_units.append_array(dogs)			
+			user_units.append_array(humans)
 			
+			for i in user_units.size():
+				if user_units[i].tile_pos == tile_pos:
+					selected_unit_num = user_units[i].unit_num
+					selected_pos = user_units[i].tile_pos			
+					user_units[i].get_child(0).play("move")	
+					break
+						
+			#Move unit
+			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false:
+				#Remove hover tiles										
+				for j in grid_height:
+					for k in grid_width:
+						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+										
+				target_pos = tile_pos 
+				var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+
+				# Find path and set hover cells
+				for h in patharray.size():
+					set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)	
+										
+				# Move unit		
+				for h in patharray.size():
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var tween = create_tween()
+					tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)
+					var unit_pos = local_to_map(user_units[selected_unit_num].position)
+					user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y			
+					await get_tree().create_timer(0.25).timeout									
+			
+				# Remove hover cells
+				for h in patharray.size():
+					set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
+		
+				for i in user_units.size():
+					user_units[i].get_child(0).play("default")
+					tile_pos = null
+		
+			#Show movement range
 			for i in all_units.size():
 				if all_units[i].unit_type == "Human":
 					#Place hover tiles		
@@ -213,7 +263,7 @@ func humans_attack_ai():
 						humans[active_humans].scale.x = 1
 					elif humans[active_humans].scale.x == 1 and humans[active_humans].position.x < attack_center_pos.x:
 						humans[active_humans].scale.x = -1						
-		
+					
 					humans[active_humans].get_child(0).play("attack")
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
@@ -617,3 +667,4 @@ func show_dog_movement_range():
 			for j in grid_height:
 				for k in grid_width:
 					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
+					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)

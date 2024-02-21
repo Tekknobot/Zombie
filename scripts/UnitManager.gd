@@ -13,6 +13,9 @@ var tile_pos
 
 @export var unit_movement: int
 @export var unit_type: String
+@export var unit_num: int
+@export var selected_pos: Vector2i
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
