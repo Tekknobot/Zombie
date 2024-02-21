@@ -141,14 +141,15 @@ func _input(event):
 					for k in surrounding_cells.size():
 						for j in cpu_units.size():
 							var attack_center_pos = local_to_map(cpu_units[j].position)
-							if surrounding_cells[k] == attack_center_pos:					
-								if user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x > attack_center_pos.x:
+							var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2
+							if surrounding_cells[k] == attack_center_pos and !cpu_units[j].is_in_group("dead"):					
+								if user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x > attack_center_position.x:
 									user_units[selected_unit_num].scale.x = 1
-								elif user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x < attack_center_pos.x:
+								elif user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x < attack_center_position.x:
 									user_units[selected_unit_num].scale.x = -1	
-								if user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x > attack_center_pos.x:
+								if user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x > attack_center_position.x:
 									user_units[selected_unit_num].scale.x = 1
-								elif user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x < attack_center_pos.x:
+								elif user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x < attack_center_position.x:
 									user_units[selected_unit_num].scale.x = -1						
 				
 								user_units[selected_unit_num].get_child(0).play("attack")
@@ -222,14 +223,15 @@ func dog_attack_ai():
 				var zombies_pos = local_to_map(dogs[active_dog].position)
 				if zombies_pos == zombie_surrounding_cells[i]:
 					var attack_center_pos = map_to_local(zombie_target_pos) + Vector2(0,0) / 2
-								
-					if dogs[active_dog].scale.x == 1 and dogs[active_dog].position.x > attack_center_pos.x:
+					var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2		
+						
+					if dogs[active_dog].scale.x == 1 and dogs[active_dog].position.x > attack_center_position.x:
 						dogs[active_dog].scale.x = 1
-					elif dogs[active_dog].scale.x == -1 and dogs[active_dog].position.x < attack_center_pos.x:
+					elif dogs[active_dog].scale.x == -1 and dogs[active_dog].position.x < attack_center_position.x:
 						dogs[active_dog].scale.x = -1	
-					if dogs[active_dog].scale.x == -1 and dogs[active_dog].position.x > attack_center_pos.x:
+					if dogs[active_dog].scale.x == -1 and dogs[active_dog].position.x > attack_center_position.x:
 						dogs[active_dog].scale.x = 1
-					elif dogs[active_dog].scale.x == 1 and dogs[active_dog].position.x < attack_center_pos.x:
+					elif dogs[active_dog].scale.x == 1 and dogs[active_dog].position.x < attack_center_position.x:
 						dogs[active_dog].scale.x = -1						
 	
 			dogs[active_dog].get_child(0).play("attack")
@@ -282,14 +284,15 @@ func humans_attack_ai():
 				var zombies_pos = local_to_map(humans[active_humans].position)
 				if zombies_pos == zombie_surrounding_cells[i]:
 					var attack_center_pos = map_to_local(zombie_target_pos) + Vector2(0,0) / 2
+					var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2	
 								
-					if humans[active_humans].scale.x == 1 and humans[active_humans].position.x > attack_center_pos.x:
+					if humans[active_humans].scale.x == 1 and humans[active_humans].position.x > attack_center_position.x:
 						humans[active_humans].scale.x = 1
-					elif humans[active_humans].scale.x == -1 and humans[active_humans].position.x < attack_center_pos.x:
+					elif humans[active_humans].scale.x == -1 and humans[active_humans].position.x < attack_center_position.x:
 						humans[active_humans].scale.x = -1	
-					if humans[active_humans].scale.x == -1 and humans[active_humans].position.x > attack_center_pos.x:
+					if humans[active_humans].scale.x == -1 and humans[active_humans].position.x > attack_center_position.x:
 						humans[active_humans].scale.x = 1
-					elif humans[active_humans].scale.x == 1 and humans[active_humans].position.x < attack_center_pos.x:
+					elif humans[active_humans].scale.x == 1 and humans[active_humans].position.x < attack_center_position.x:
 						humans[active_humans].scale.x = -1						
 					
 					humans[active_humans].get_child(0).play("attack")
@@ -344,14 +347,15 @@ func zombie_attack_ai():
 				var zombies_pos = local_to_map(zombies[active_zombie].position)
 				if zombies_pos == zombie_surrounding_cells[i]:
 					var attack_center_pos = map_to_local(zombie_target_pos) + Vector2(0,0) / 2
+					var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2	
 								
-					if zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x > attack_center_pos.x:
+					if zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x > attack_center_position.x:
 						zombies[active_zombie].scale.x = 1
-					elif zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x < attack_center_pos.x:
+					elif zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x < attack_center_position.x:
 						zombies[active_zombie].scale.x = -1	
-					if zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x > attack_center_pos.x:
+					if zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x > attack_center_position.x:
 						zombies[active_zombie].scale.x = 1
-					elif zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x < attack_center_pos.x:
+					elif zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x < attack_center_position.x:
 						zombies[active_zombie].scale.x = -1						
 		
 
