@@ -3,9 +3,6 @@ extends Node2D
 @export var node2D: Node2D
 
 var rng = RandomNumberGenerator.new()
-var available_units = []
-var CPU_units = []
-var USER_units = []
 
 var open_tiles = []
 var random = []

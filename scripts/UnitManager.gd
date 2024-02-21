@@ -11,6 +11,8 @@ var moving : bool
 
 var tile_pos
 
+@export var unit_movement: int
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	old_pos = global_position;
