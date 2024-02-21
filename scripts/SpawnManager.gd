@@ -1,6 +1,7 @@
 extends Node2D
 
 @export var node2D: Node2D
+@export var spawn_button: Button
 
 var rng = RandomNumberGenerator.new()
 
@@ -22,6 +23,8 @@ func _process(delta):
 	pass
 
 func spawn():
+	spawn_button.hide()
+	
 	# Find open tiles
 	open_tiles.clear()	
 	for i in 16:
