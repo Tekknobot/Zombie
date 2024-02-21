@@ -15,6 +15,7 @@ var humans = []
 
 var all_units = []
 var user_units = []
+var cpu_units = []
 
 var selected_unit
 var selected_pos = Vector2i(0,0);
@@ -95,6 +96,8 @@ func _input(event):
 			user_units.append_array(dogs)			
 			user_units.append_array(humans)
 			
+			cpu_units.append_array(zombies)
+			
 			for i in user_units.size():
 				if user_units[i].tile_pos == tile_pos:
 					selected_unit_num = user_units[i].unit_num
@@ -132,7 +135,32 @@ func _input(event):
 				for i in user_units.size():
 					user_units[i].get_child(0).play("default")
 					tile_pos = null
-		
+					
+				for i in user_units.size():	
+					var surrounding_cells = get_surrounding_cells(target_pos)
+					for k in surrounding_cells.size():
+						for j in cpu_units.size():
+							var attack_center_pos = local_to_map(cpu_units[j].position)
+							if surrounding_cells[k] == attack_center_pos:					
+								if user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x > attack_center_pos.x:
+									user_units[selected_unit_num].scale.x = 1
+								elif user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x < attack_center_pos.x:
+									user_units[selected_unit_num].scale.x = -1	
+								if user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x > attack_center_pos.x:
+									user_units[selected_unit_num].scale.x = 1
+								elif user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x < attack_center_pos.x:
+									user_units[selected_unit_num].scale.x = -1						
+				
+								user_units[selected_unit_num].get_child(0).play("attack")
+								var tween: Tween = create_tween()
+								tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)			
+								await get_tree().create_timer(1).timeout
+								cpu_units[j].get_child(0).play("death")
+								user_units[selected_unit_num].get_child(0).play("default")	
+								cpu_units[j].add_to_group("dead")
+								cpu_units[j].remove_from_group("zombies")
+								return						
+					
 			#Show movement range
 			for i in all_units.size():
 				if all_units[i].unit_type == "Human":
