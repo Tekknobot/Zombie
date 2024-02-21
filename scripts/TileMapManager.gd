@@ -92,7 +92,7 @@ func _input(event):
 			all_units.append_array(humans)
 			all_units.append_array(zombies)
 			all_units.append_array(dogs)
-
+			
 			user_units.append_array(dogs)			
 			user_units.append_array(humans)
 			
@@ -121,6 +121,7 @@ func _input(event):
 										
 				# Move unit		
 				for h in patharray.size():
+					user_units[selected_unit_num].get_child(0).play("move")
 					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 					var tween = create_tween()
 					tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)
@@ -162,7 +163,7 @@ func _input(event):
 								user_units[selected_unit_num].get_child(0).play("default")	
 								cpu_units[j].add_to_group("dead")
 								cpu_units[j].remove_from_group("zombies")
-								
+					
 								user_units[selected_unit_num].moved = true
 								return						
 					
@@ -187,6 +188,7 @@ func _input(event):
 			
 			for i in user_units.size():
 				if user_units[selected_unit_num].moved == false:
+					user_units[i].get_child(0).play("default")					
 					#Place hover tiles		
 					for j in humans.size():
 						var unit_pos = local_to_map(humans[j].position)
