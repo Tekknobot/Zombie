@@ -20,7 +20,7 @@ var cpu_units = []
 var selected_unit
 var selected_pos = Vector2i(0,0);
 var target_pos = Vector2i(0,0);
-var selected_unit_num
+var selected_unit_num = 1
 
 var moving = false
 
@@ -166,15 +166,7 @@ func _input(event):
 								user_units[selected_unit_num].moved = true
 								return						
 					
-			#Show movement range
-			for i in user_units.size():
-				if user_units[selected_unit_num].moved == false:
-					#Place hover tiles		
-					for j in humans.size():
-						var unit_pos = local_to_map(humans[j].position)
-						if unit_pos == tile_pos:
-							show_humans_movement_range()
-									
+			#Show movement range	
 			for i in all_units.size():				
 				if all_units[i].unit_type == "Zombie":		
 					#Place hover tiles		
@@ -182,6 +174,7 @@ func _input(event):
 						var unit_pos = local_to_map(zombies[j].position)
 						if unit_pos == tile_pos:					
 							show_zombie_movement_range()
+							return
 							
 			for i in all_units.size():					
 				if all_units[i].unit_type == "Dog" and all_units[i].moved == false:		
@@ -189,7 +182,17 @@ func _input(event):
 					for j in dogs.size():
 						var unit_pos = local_to_map(dogs[j].position)
 						if unit_pos == tile_pos:					
-							show_dog_movement_range()						
+							show_dog_movement_range()	
+							return
+			
+			for i in user_units.size():
+				if user_units[selected_unit_num].moved == false:
+					#Place hover tiles		
+					for j in humans.size():
+						var unit_pos = local_to_map(humans[j].position)
+						if unit_pos == tile_pos:
+							show_humans_movement_range()
+							return												
 
 func dog_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -314,8 +317,8 @@ func humans_attack_ai():
 func zombie_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
 	var active_zombie = rng.randi_range(0,zombies.size()-1)
-	var target_zombie = rng.randi_range(0,zombies.size()-1)			
-	if !zombies[active_zombie].is_in_group("dead") and !zombies[target_zombie].is_in_group("dead"):
+	var target_human = rng.randi_range(0,humans.size()-1)			
+	if !zombies[active_zombie].is_in_group("dead") and !humans[target_human].is_in_group("dead"):
 		var closest_atack = zombies[active_zombie].get_closest_attack_humans()										
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
@@ -352,8 +355,7 @@ func zombie_attack_ai():
 			for i in 4:
 				var zombies_pos = local_to_map(zombies[active_zombie].position)
 				if zombies_pos == zombie_surrounding_cells[i]:
-					var attack_center_pos = map_to_local(zombie_target_pos) + Vector2(0,0) / 2
-					var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2	
+					var attack_center_position = map_to_local(zombie_target_pos) + Vector2(0,0) / 2	
 								
 					if zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x > attack_center_position.x:
 						zombies[active_zombie].scale.x = 1
@@ -372,7 +374,7 @@ func zombie_attack_ai():
 					closest_atack.get_child(0).play("death")	
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("dead")
-					closest_atack.remove_from_group("zombies")
+					closest_atack.remove_from_group("humans")
 					zombies[active_zombie].get_child(0).play("default")	
 					break	
 			
@@ -381,7 +383,7 @@ func _on_zombie_button_pressed():
 		modulate = Color8(255, 255, 255)
 		user_units[i].moved = false
 			
-	for i in 3:
+	for i in zombies.size():
 		await zombie_attack_ai()
 	
 	#Remove hover tiles										
