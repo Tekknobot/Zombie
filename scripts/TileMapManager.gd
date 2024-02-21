@@ -28,6 +28,7 @@ var moving = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	astar_grid.size = Vector2i(16, 16)
@@ -76,7 +77,6 @@ func _process(delta):
 	for h in 16:
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
-
 
 func _input(event):
 	if event is InputEventMouseButton:			
@@ -377,6 +377,7 @@ func zombie_attack_ai():
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("dead")
 					closest_atack.remove_from_group("humans")
+					closest_atack.position.y -= 500
 					zombies[active_zombie].get_child(0).play("default")	
 					break	
 			
@@ -384,14 +385,14 @@ func _on_zombie_button_pressed():
 	for i in user_units.size():
 		modulate = Color8(255, 255, 255)
 		user_units[i].moved = false
-			
-	for i in zombies.size():
-		await zombie_attack_ai()
-	
+
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			
+	for i in zombies.size():
+		await zombie_attack_ai()
 			
 func _on_dog_button_pressed():
 	dog_attack_ai()
