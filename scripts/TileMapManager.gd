@@ -17,13 +17,12 @@ var all_units = []
 var user_units = []
 var cpu_units = []
 
-var selected_unit
 var selected_pos = Vector2i(0,0);
 var target_pos = Vector2i(0,0);
 var selected_unit_num = 1
 
 var moving = false
-
+var clicked_zombie = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -103,10 +102,10 @@ func _input(event):
 					selected_unit_num = user_units[i].unit_num
 					selected_pos = user_units[i].tile_pos			
 					user_units[i].get_child(0).play("move")	
-					break
+					break	
 						
 			#Move unit
-			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false:
+			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
 				#Remove hover tiles										
 				for j in grid_height:
 					for k in grid_width:
@@ -557,6 +556,8 @@ func show_zombie_movement_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 
+	clicked_zombie = true
+	
 func show_humans_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -705,6 +706,8 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 
+	clicked_zombie = false
+	
 func show_dog_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -730,3 +733,5 @@ func show_dog_movement_range():
 				for k in grid_width:
 					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
 					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
+
+	clicked_zombie = false
