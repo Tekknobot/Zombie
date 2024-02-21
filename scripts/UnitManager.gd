@@ -53,7 +53,6 @@ func _process(delta):
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
 func get_closest_attack_zombies():
-	self.remove_from_group("zombies")
 	var all_players = get_tree().get_nodes_in_group("zombies")
 	var closest_player = null
  
@@ -64,6 +63,19 @@ func get_closest_attack_zombies():
 			var distance_to_closest_player = global_position.distance_squared_to(closest_player.global_position)
 			if (distance_to_this_player < distance_to_closest_player):
 				closest_player = player
-	
-	self.add_to_group("zombies")			
+				
+	return closest_player
+
+func get_closest_attack_dog():
+	var all_players = get_tree().get_nodes_in_group("dogs")
+	var closest_player = null
+ 
+	if (all_players.size() > 0):
+		closest_player = all_players[0]
+		for player in all_players:
+			var distance_to_this_player = global_position.distance_squared_to(player.global_position)	
+			var distance_to_closest_player = global_position.distance_squared_to(closest_player.global_position)
+			if (distance_to_this_player < distance_to_closest_player):
+				closest_player = player
+				
 	return closest_player
