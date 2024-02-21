@@ -148,7 +148,7 @@ func zombie_attack_ai():
 	var active_zombie = rng.randi_range(0,zombies.size()-1)
 	var target_zombie = rng.randi_range(0,zombies.size()-1)			
 	if !zombies[active_zombie].is_in_group("dead") and !zombies[target_zombie].is_in_group("dead"):
-		var closest_atack = zombies[active_zombie].get_closest_attack_dog()										
+		var closest_atack = zombies[active_zombie].get_closest_attack_humans()										
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
 		
