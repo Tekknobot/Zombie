@@ -14,6 +14,7 @@ var moves = {N: Vector2i(0, -1),
 			 W: Vector2i(-1, 0)}
 			
 @onready var Map = $TileMap
+@export var spawn_button : Button
 
 var building = preload("res://scenes/building.scn")
 var tower = preload("res://scenes/tower.scn")
@@ -59,6 +60,8 @@ var my_odd_y: int
 var progresscount: int
 var biome
 var foundation_tile
+
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():	
@@ -420,6 +423,7 @@ func spawn_towers_final():
 	structures.append_array(districts)	
 		
 	check_duplicates(structures)
+	spawn_button.show()
 							
 func check_duplicates(a):
 	var is_dupe = false

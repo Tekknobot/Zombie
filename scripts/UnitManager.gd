@@ -17,6 +17,7 @@ var tile_pos
 @export var unit_movement: int
 @export var unit_type: String
 @export var unit_num: int
+@export var selected = false
 @export var selected_pos: Vector2i
 
 
@@ -62,9 +63,9 @@ func _process(delta):
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
 	if self.moved == true:
-		modulate = Color8(110, 110, 110)
+		self.modulate = Color8(110, 110, 110)
 	else:
-		modulate = Color8(255, 255, 255)
+		self.modulate = Color8(255, 255, 255)
 
 func get_closest_attack_zombies():
 	var all_players = get_tree().get_nodes_in_group("zombies")

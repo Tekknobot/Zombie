@@ -42,7 +42,7 @@ func spawn():
 		var dog_inst = dog.instantiate()
 		node2D.add_child(dog_inst)
 		dog_inst.add_to_group("dogs")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[124]) + Vector2(0,0) / 2
 		dog_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(dog_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -64,7 +64,7 @@ func spawn():
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("humans")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[125]) + Vector2(0,0) / 2
 		soldier_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(soldier_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -86,7 +86,7 @@ func spawn():
 		var rambo_inst = rambo.instantiate()
 		node2D.add_child(rambo_inst)
 		rambo_inst.add_to_group("humans")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[126]) + Vector2(0,0) / 2
 		rambo_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(rambo_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -110,7 +110,7 @@ func spawn():
 		var zomb = zombie.instantiate()
 		node2D.add_child(zomb)
 		zomb.add_to_group("zombies")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[i]) + Vector2(0,0) / 2
 		zomb.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(zomb, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
