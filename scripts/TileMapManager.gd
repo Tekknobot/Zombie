@@ -7,6 +7,7 @@ var grid_height = 16
 var rng = RandomNumberGenerator.new()
 
 @export var hovertile: Sprite2D
+@export var zombie_button: Button
 
 var astar_grid = AStarGrid2D.new()
 var zombies = []
@@ -401,6 +402,8 @@ func zombie_attack_ai():
 					break	
 			
 func _on_zombie_button_pressed():
+	zombie_button.hide()
+	
 	for i in user_units.size():
 		modulate = Color8(255, 255, 255)
 		user_units[i].moved = false
@@ -412,6 +415,8 @@ func _on_zombie_button_pressed():
 			
 	for i in zombies.size():
 		await zombie_attack_ai()
+	
+	zombie_button.show()
 			
 func _on_dog_button_pressed():
 	dog_attack_ai()
@@ -574,7 +579,6 @@ func show_zombie_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-3), 10, Vector2i(0, 0), 0)															
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
-
 	
 func show_humans_movement_range():
 	#Remove hover tiles										
@@ -722,7 +726,6 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-3), 10, Vector2i(0, 0), 0)															
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
-
 	
 func show_dog_movement_range():
 	#Remove hover tiles										

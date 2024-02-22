@@ -129,4 +129,4 @@ func get_random_numbers(from, to):
 
 func _on_spawn_button_pressed():
 	await spawn()
-	#get_node("../TileMap").dog_attack_ai()
+	#get_node("../TileMap").zombie_attack_ai()
