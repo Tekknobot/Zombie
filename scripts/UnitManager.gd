@@ -20,6 +20,8 @@ var tile_pos
 @export var selected = false
 @export var selected_pos: Vector2i
 
+var attacked = false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

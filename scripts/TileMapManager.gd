@@ -8,6 +8,7 @@ var rng = RandomNumberGenerator.new()
 
 @export var hovertile: Sprite2D
 @export var zombie_button: Button
+@export var node2D: Node2D
 
 var astar_grid = AStarGrid2D.new()
 var zombies = []
@@ -24,7 +25,7 @@ var selected_unit_num = 1
 
 var moving = false
 var clicked_zombie = false
-var clicked_dog = false
+var right_clicked_unit
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -106,7 +107,7 @@ func _input(event):
 					break
 					
 			#Move unit
-			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true:
+			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
 				#Remove hover tiles										
 				for j in grid_height:
 					for k in grid_width:
@@ -189,6 +190,7 @@ func _input(event):
 						if unit_pos == tile_pos:					
 							show_dog_movement_range()	
 							all_units[i].selected = true
+							clicked_zombie = false
 							return
 						else:
 							all_units[i].selected = false
@@ -207,6 +209,7 @@ func _input(event):
 						if unit_pos == tile_pos:
 							show_humans_movement_range()
 							user_units[selected_unit_num].selected = true
+							clicked_zombie = false
 							return	
 						else:
 							user_units[selected_unit_num].selected = false	
@@ -216,6 +219,82 @@ func _input(event):
 						for k in grid_width:
 							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)																		
 
+		if event.button_index == MOUSE_BUTTON_RIGHT:				
+			#Remove hover tiles										
+			for j in grid_height:
+				for k in grid_width:
+					set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+																			
+			var mouse_pos = get_global_mouse_position()
+			mouse_pos.y += 8
+			var tile_pos = local_to_map(mouse_pos)		
+			var tile_data = get_cell_tile_data(0, tile_pos)
+
+			if tile_data is TileData:				
+				for i in user_units.size():
+					var unit_pos = local_to_map(user_units[i].position)
+
+					if unit_pos == tile_pos:
+						right_clicked_unit = user_units[i]
+						
+						var hoverflag_1 = true															
+						for j in 15:	
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							if hoverflag_1 == true:
+								for k in node2D.structures.size():
+									if tile_pos.x-j >= 0:	
+										set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
+										if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
+											hoverflag_1 = false
+											set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
+											break	
+								
+						var hoverflag_2 = true										
+						for j in 15:	
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							if hoverflag_2 == true:											
+								for k in node2D.structures.size():																						
+									if tile_pos.y+j <= 15:
+										set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
+										if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
+											hoverflag_2 = false
+											set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
+											break
+
+						var hoverflag_3 = true	
+						for j in 15:	
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							if hoverflag_3 == true:											
+								for k in node2D.structures.size():																													
+									if tile_pos.x+j <= 15:
+										set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
+										if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
+											hoverflag_3 = false
+											set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
+											break
+
+						var hoverflag_4 = true	
+						for j in 15:	
+							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+							if hoverflag_4 == true:											
+								for k in node2D.structures.size():																											
+									if tile_pos.y-j >= 0:									
+										set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
+										if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
+											hoverflag_4 = false
+											set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
+											break
+
+					
+			if tile_pos.x == 0:
+				set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+			if tile_pos.y == 0:
+				set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+			if tile_pos.x == 15:
+				set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+			if tile_pos.y == 15:
+				set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
+	
 func dog_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
 	dogs = get_tree().get_nodes_in_group("dogs")
@@ -579,6 +658,8 @@ func show_zombie_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y-3), 10, Vector2i(0, 0), 0)															
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
+	
+	clicked_zombie = true
 	
 func show_humans_movement_range():
 	#Remove hover tiles										

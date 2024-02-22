@@ -355,7 +355,12 @@ func spawn_buildings():
 				await get_tree().create_timer(0).timeout
 				Map.set_cell(0, Vector2i(i, j), 6, Vector2i(0, 0), 0)
 				progresscount += 1					
-				
+
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
+					
 	spawn_stadiums()	
 				
 func spawn_stadiums():
@@ -376,7 +381,12 @@ func spawn_stadiums():
 				await get_tree().create_timer(0).timeout
 				Map.set_cell(0, Vector2i(i, j), 7, Vector2i(0, 0), 0)
 				progresscount += 1
-	
+
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
+		
 	spawn_districts()
 	
 func spawn_districts():
@@ -398,6 +408,11 @@ func spawn_districts():
 				Map.set_cell(0, Vector2i(i, j), 8, Vector2i(0, 0), 0)
 				progresscount += 1
 
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
+	
 	spawn_towers_final()
 	
 func spawn_towers_final():
@@ -415,15 +430,11 @@ func spawn_towers_final():
 				tower_inst.z_index = tile_pos.x + tile_pos.y
 				tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
 				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
-				progresscount += 1
-
-	structures.append_array(buildings)
-	structures.append_array(towers)
-	structures.append_array(stadiums)
-	structures.append_array(districts)	
-		
+				progresscount += 1	
+	
 	check_duplicates(structures)
 	spawn_button.show()
+	add_to_structures()
 							
 func check_duplicates(a):
 	var is_dupe = false
@@ -452,5 +463,18 @@ func check_duplicates(a):
 				a[i].get_child(0).modulate = Color8(255, 255, 255)	
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
 
+func add_to_structures():
+	buildings = get_tree().get_nodes_in_group("buildings")
+	towers = get_tree().get_nodes_in_group("towers")
+	stadiums = get_tree().get_nodes_in_group("stadiums")
+	districts = get_tree().get_nodes_in_group("districts")
+		
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
+	
+	print(structures.size())
+		
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
