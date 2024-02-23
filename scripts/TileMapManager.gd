@@ -941,6 +941,15 @@ func SetLinePoints(line: Line2D, a: Vector2, postA: Vector2, preB: Vector2, b: V
 
 	get_node("../Seeker").hide()		
 
+	var explosion = preload("res://scenes/vfx/explosion.scn")
+	var explosion_instance = explosion.instantiate()
+	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
+	explosion_instance.set_name("explosion")
+	get_parent().add_child(explosion_instance)
+	explosion_instance.position = explosion_position	
+	explosion_instance.position.y -= 16
+	explosion_instance.z_index = (_b.x + _b.y) + 1000
+
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
