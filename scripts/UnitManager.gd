@@ -69,6 +69,21 @@ func _process(delta):
 	else:
 		self.modulate = Color8(255, 255, 255)
 
+	
+	
+	var unit_global_position = self.position
+	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
+	
+	# Check if off map
+	for i in get_node("../TileMap").all_units.size():
+		var unit_center_position = get_node("../TileMap").all_units[i].position
+		var unit_position = get_node("../TileMap").local_to_map(unit_center_position)		
+		if unit_pos.x < 0 or unit_pos.x > 15 or unit_pos.y < 0 or unit_pos.y > 15:
+			self.get_child(0).play("death")
+			await get_tree().create_timer(0.5).timeout	
+			self.position.y -= 500							
+			break
+
 func get_closest_attack_zombies():
 	var all_players = get_tree().get_nodes_in_group("zombies")
 	var closest_player = null

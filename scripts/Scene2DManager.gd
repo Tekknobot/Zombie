@@ -444,7 +444,7 @@ func check_duplicates(a):
 		if is_dupe == true:
 			break
 		for j in range(a.size()):
-			if a[j].position == a[i].position && i != j:
+			if a[j].position == a[i].position:
 				#is_dupe = true
 				found_dupe = true
 				#print("duplicate")
