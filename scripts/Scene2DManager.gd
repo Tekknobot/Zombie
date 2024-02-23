@@ -129,7 +129,7 @@ func generate_world():
 
 func spawn_structures():						
 	# Randomize structures at start	
-	for i in 32: #buildings
+	for i in 64: #buildings
 		var my_random_tile_x = rng.randi_range(1, 14)
 		var my_random_tile_y = rng.randi_range(1, 14)
 		var tile_pos = Vector2i(my_random_tile_x, my_random_tile_y)
@@ -275,8 +275,7 @@ func environment_tiles():
 
 func spawn_towersblank():	
 	towerblank = get_tree().get_nodes_in_group("towersblank")
-	towerblank.append_array(towerblank)			
-	check_duplicates(structures)	
+	towerblank.append_array(towerblank)				
 	generate_roads()
 
 func generate_roads():				
@@ -333,8 +332,7 @@ func generate_roads():
 	for i in 3: #towers intresection final
 		var tower_pos = Map.local_to_map(towerblank[i].position)
 		Map.set_cell(0, tower_pos, 43, Vector2i(0, 0), 0)
-							
-	check_duplicates(structures)							
+														
 	spawn_buildings()
 		
 func spawn_buildings():
@@ -381,6 +379,7 @@ func spawn_stadiums():
 				await get_tree().create_timer(0).timeout
 				Map.set_cell(0, Vector2i(i, j), 7, Vector2i(0, 0), 0)
 				progresscount += 1
+				
 
 	structures.append_array(buildings)
 	structures.append_array(towers)
@@ -431,12 +430,26 @@ func spawn_towers_final():
 				tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
 				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
 				progresscount += 1	
+				
 	towers = get_tree().get_nodes_in_group("towers")
 	structures.append_array(towers)
-	check_duplicates(structures)
 	spawn_button.show()
 	add_to_structures_array()
 							
+func add_to_structures_array():
+	buildings = get_tree().get_nodes_in_group("buildings")
+	towers = get_tree().get_nodes_in_group("towers")
+	stadiums = get_tree().get_nodes_in_group("stadiums")
+	districts = get_tree().get_nodes_in_group("districts")
+		
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
+	
+	check_duplicates(structures)
+	#print(structures.size())
+
 func check_duplicates(a):
 	var is_dupe = false
 	var found_dupe = false 
@@ -453,32 +466,19 @@ func check_duplicates(a):
 				var j_global = Map.map_to_local(Vector2i(j_pos.x, j_pos.y)) + Vector2(0,0) / 2	
 				a[j].position = j_global
 				var tile_pos_j = Vector2i(j_pos.x, j_pos.y)
-				a[j].get_child(0).modulate = Color8(0, 0, 0)
+				#a[j].get_child(0).modulate = Color8(0, 0, 0)
 				a[j].get_child(0).modulate.a = 0	
 				a[j].z_index = tile_pos_j.x + tile_pos_j.y
-				Map.astar_grid.set_point_solid(tile_pos_j, false)
+				Map.astar_grid.set_point_solid(j_pos, true)
 
 				var i_pos = Map.local_to_map(a[i].position)	
 				var i_global = Map.map_to_local(Vector2i(i_pos.x, i_pos.y)) + Vector2(0,0) / 2	
 				a[i].position = i_global
 				var tile_pos_i = Vector2i(i_pos.x, i_pos.y)
-				a[i].get_child(0).modulate = Color8(255, 255, 255)	
-				a[j].get_child(0).modulate.a = 0
+				#a[i].get_child(0).modulate = Color8(255, 255, 255)	
+				a[j].get_child(0).modulate.a = 1
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
-				Map.astar_grid.set_point_solid(tile_pos_i, false)
-
-func add_to_structures_array():
-	buildings = get_tree().get_nodes_in_group("buildings")
-	towers = get_tree().get_nodes_in_group("towers")
-	stadiums = get_tree().get_nodes_in_group("stadiums")
-	districts = get_tree().get_nodes_in_group("districts")
-		
-	structures.append_array(buildings)
-	structures.append_array(towers)
-	structures.append_array(stadiums)
-	structures.append_array(districts)
-	
-	print(structures.size())
+				Map.astar_grid.set_point_solid(i_pos, true)
 		
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()

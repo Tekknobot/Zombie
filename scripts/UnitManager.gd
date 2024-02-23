@@ -13,6 +13,7 @@ var moved = false
 
 var tile_pos
 
+@export var unit_team: int
 @export var unit_name: String
 @export var unit_movement: int
 @export var unit_type: String
@@ -21,10 +22,19 @@ var tile_pos
 @export var selected_pos: Vector2i
 
 var attacked = false
+var zombies = []
+var humans = []
+var all_units = []
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	zombies = get_tree().get_nodes_in_group("zombies")
+	humans = get_tree().get_nodes_in_group("humans")
+	
+	all_units.append_array(zombies)
+	all_units.append_array(humans)
+	
 	old_pos = global_position;
 	pos = global_position;
 	
@@ -64,13 +74,12 @@ func _process(delta):
 	else:
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
-	if self.moved == true:
+	if self.moved == true and self.attacked == true:
 		self.modulate = Color8(110, 110, 110)
 	else:
 		self.modulate = Color8(255, 255, 255)
 
-	
-	
+
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
 	
@@ -84,6 +93,22 @@ func _process(delta):
 			self.position.y -= 500		
 			self.add_to_group("dead")
 			self.remove_from_group("zombies")								
+			break
+
+	# Check for unit collisions	
+	for i in all_units.size():
+		if all_units[i] != self and self.position == all_units[i].position:
+			self.get_child(0).play("death")
+			await get_tree().create_timer(0.5).timeout	
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")	
+			
+			all_units[i].get_child(0).play("death")
+			await get_tree().create_timer(0.5).timeout	
+			all_units[i].position.y -= 500		
+			all_units[i].add_to_group("dead")
+			all_units[i].remove_from_group("zombies")				
 			break
 
 func get_closest_attack_zombies():

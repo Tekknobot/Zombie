@@ -118,8 +118,12 @@ func _input(event):
 				for h in all_units.size():					
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 						
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48:
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false:
 						only_once = false
+						
+						if right_clicked_unit.unit_team == 1:
+							right_clicked_unit.attacked = true
+							right_clicked_unit.moved = true
 						
 						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
@@ -328,7 +332,7 @@ func _input(event):
 						right_clicked_unit = user_units[i]
 						
 						var hoverflag_1 = true															
-						for j in 15:	
+						for j in 16:	
 							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 							if hoverflag_1 == true:
 								for k in node2D.structures.size():
@@ -340,11 +344,11 @@ func _input(event):
 											break	
 								
 						var hoverflag_2 = true										
-						for j in 15:	
+						for j in 16:	
 							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 							if hoverflag_2 == true:											
 								for k in node2D.structures.size():																						
-									if tile_pos.y+j <= 15:
+									if tile_pos.y+j <= 16:
 										set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
 										if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
 											hoverflag_2 = false
@@ -352,11 +356,11 @@ func _input(event):
 											break
 
 						var hoverflag_3 = true	
-						for j in 15:	
+						for j in 16:	
 							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 							if hoverflag_3 == true:											
 								for k in node2D.structures.size():																													
-									if tile_pos.x+j <= 15:
+									if tile_pos.x+j <= 16:
 										set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
 										if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
 											hoverflag_3 = false
@@ -364,7 +368,7 @@ func _input(event):
 											break
 
 						var hoverflag_4 = true	
-						for j in 15:	
+						for j in 16:	
 							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 							if hoverflag_4 == true:											
 								for k in node2D.structures.size():																											
@@ -576,6 +580,7 @@ func _on_zombie_button_pressed():
 	for i in user_units.size():
 		modulate = Color8(255, 255, 255)
 		user_units[i].moved = false
+		user_units[i].attacked = false
 
 	#Remove hover tiles										
 	for j in grid_height:
