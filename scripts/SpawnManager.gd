@@ -14,6 +14,8 @@ var dog = preload("res://scenes/sprites/Dog.scn")
 var soldier = preload("res://scenes/sprites/Soldier.scn")
 var rambo = preload("res://scenes/sprites/Rambo.scn")
 
+var spawn_complete = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -128,4 +130,5 @@ func get_random_numbers(from, to):
 
 func _on_spawn_button_pressed():
 	await spawn()
+	spawn_complete = true
 	#get_node("../TileMap").zombie_attack_ai()

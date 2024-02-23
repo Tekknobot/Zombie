@@ -462,23 +462,26 @@ func check_duplicates(a):
 				#is_dupe = true
 				found_dupe = true
 				#print("duplicate")
-				var j_pos = Map.local_to_map(a[j].position)	
-				var j_global = Map.map_to_local(Vector2i(j_pos.x, j_pos.y)) + Vector2(0,0) / 2	
-				a[j].position = j_global
-				var tile_pos_j = Vector2i(j_pos.x, j_pos.y)
-				#a[j].get_child(0).modulate = Color8(0, 0, 0)
-				a[j].get_child(0).modulate.a = 0	
-				a[j].z_index = tile_pos_j.x + tile_pos_j.y
-				Map.astar_grid.set_point_solid(j_pos, true)
-
+				
 				var i_pos = Map.local_to_map(a[i].position)	
 				var i_global = Map.map_to_local(Vector2i(i_pos.x, i_pos.y)) + Vector2(0,0) / 2	
 				a[i].position = i_global
 				var tile_pos_i = Vector2i(i_pos.x, i_pos.y)
 				#a[i].get_child(0).modulate = Color8(255, 255, 255)	
-				a[j].get_child(0).modulate.a = 1
+				a[j].get_child(0).modulate.a = 0
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
-				Map.astar_grid.set_point_solid(i_pos, true)
+				Map.astar_grid.set_point_solid(i_pos, false)
+								
+				var j_pos = Map.local_to_map(a[j].position)	
+				var j_global = Map.map_to_local(Vector2i(j_pos.x, j_pos.y)) + Vector2(0,0) / 2	
+				a[j].position = j_global
+				var tile_pos_j = Vector2i(j_pos.x, j_pos.y)
+				#a[j].get_child(0).modulate = Color8(0, 0, 0)
+				a[j].get_child(0).modulate.a = 1	
+				a[j].z_index = tile_pos_j.x + tile_pos_j.y
+				Map.astar_grid.set_point_solid(j_pos, true)
+
+
 		
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()

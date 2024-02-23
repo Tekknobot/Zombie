@@ -26,6 +26,13 @@ var zombies = []
 var humans = []
 var all_units = []
 
+var structures: Array[Area2D]
+var buildings = []
+var towers = []
+var stadiums = []
+var districts = []
+
+var only_once = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -34,6 +41,16 @@ func _ready():
 	
 	all_units.append_array(zombies)
 	all_units.append_array(humans)
+
+	buildings = get_tree().get_nodes_in_group("buildings")
+	towers = get_tree().get_nodes_in_group("towers")
+	stadiums = get_tree().get_nodes_in_group("stadiums")
+	districts = get_tree().get_nodes_in_group("districts")
+
+	structures.append_array(buildings)
+	structures.append_array(towers)
+	structures.append_array(stadiums)
+	structures.append_array(districts)
 	
 	old_pos = global_position;
 	pos = global_position;
@@ -109,6 +126,35 @@ func _process(delta):
 			all_units[i].position.y -= 500		
 			all_units[i].add_to_group("dead")
 			all_units[i].remove_from_group("zombies")				
+			break
+
+	#Structure collisions			
+	for i in structures.size():
+		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
+		var structure_pos = get_node("../TileMap").local_to_map(get_node("/root/Scene2D").structures[i].position)
+		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true and only_once == true:
+			only_once = false;	
+			self.get_child(0).play("death")
+			
+			#await get_tree().create_timer(0.5).timeout	
+			
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")
+
+			#await get_tree().create_timer(0).timeout
+			
+			var explosion = preload("res://scenes/vfx/explosion.scn")
+			var explosion_instance = explosion.instantiate()
+			var explosion_position = get_node("../TileMap").map_to_local(structure_pos) + Vector2(0,0) / 2
+			explosion_instance.set_name("explosion")
+			get_parent().add_child(explosion_instance)
+			explosion_instance.position = explosion_position	
+			explosion_instance.position.y -= 16
+			explosion_instance.z_index = (structure_pos.x + structure_pos.y) + 1
+					
+			get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
+			get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 
 			break
 
 func get_closest_attack_zombies():
