@@ -10,7 +10,16 @@ var rng = RandomNumberGenerator.new()
 @export var zombie_button: Button
 @export var node2D: Node2D
 
+@onready var line_2d = $"../Line2D"
+@onready var post_a = $"../postA"
+@onready var pre_b = $"../preB"
+@onready var sprite_2d = $"../Sprite2D"
+
+var projectile = preload("res://scenes/projectiles/projectile.scn")
+
 var astar_grid = AStarGrid2D.new()
+var clicked_pos = Vector2i(0,0);
+
 var zombies = []
 var dogs = []
 var humans = []
@@ -26,6 +35,9 @@ var selected_unit_num = 1
 var moving = false
 var clicked_zombie = false
 var right_clicked_unit
+
+var only_once = true
+var attack_range = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -87,18 +99,93 @@ func _input(event):
 			mouse_pos.y += 8
 			var tile_pos = local_to_map(mouse_pos)	
 			var tile_data = get_cell_tile_data(0, tile_pos)
+
+			clicked_pos = tile_pos	
+
 			humans = get_tree().get_nodes_in_group("humans")
 			zombies = get_tree().get_nodes_in_group("zombies")
 			dogs = get_tree().get_nodes_in_group("dogs")
 			
 			all_units.append_array(humans)
 			all_units.append_array(zombies)
-			all_units.append_array(dogs)
-			
+			all_units.append_array(dogs)			
 			user_units.append_array(dogs)			
-			user_units.append_array(humans)
-			
+			user_units.append_array(humans)			
 			cpu_units.append_array(zombies)
+
+			# Ranged Attack
+			if only_once:
+				for h in all_units.size():					
+					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+						
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48:
+						only_once = false
+						
+						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
+						
+						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1	
+						
+						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1																																					
+												
+						right_clicked_unit.get_child(0).play("attack")	
+						
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")		
+						
+						var _bumpedvector = clicked_pos
+						var right_clicked_pos = local_to_map(right_clicked_unit.position)
+						
+						#get_node("../Camera2D").shake(0.5, 30, 3)
+						
+						
+						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(0,0), Vector2(0,0), Vector2(all_units[h].position.x,all_units[h].position.y-16))
+						all_units[h].get_child(0).set_offset(Vector2(0,0))
+													
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y	
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+
+						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
+	
+						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
+						
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y		
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							
+						only_once = true
 			
 			for i in user_units.size():
 				if user_units[i].tile_pos == tile_pos:
@@ -174,7 +261,7 @@ func _input(event):
 					#Place hover tiles		
 					for j in zombies.size():
 						var unit_pos = local_to_map(zombies[j].position)
-						if unit_pos == tile_pos:					
+						if unit_pos == tile_pos and attack_range == false:					
 							show_zombie_movement_range()
 							all_units[i].selected = false
 							return
@@ -191,6 +278,7 @@ func _input(event):
 							show_dog_movement_range()	
 							all_units[i].selected = true
 							clicked_zombie = false
+							attack_range = false
 							return
 						else:
 							all_units[i].selected = false
@@ -210,6 +298,7 @@ func _input(event):
 							show_humans_movement_range()
 							user_units[selected_unit_num].selected = true
 							clicked_zombie = false
+							attack_range = false
 							return	
 						else:
 							user_units[selected_unit_num].selected = false	
@@ -235,6 +324,7 @@ func _input(event):
 					var unit_pos = local_to_map(user_units[i].position)
 
 					if unit_pos == tile_pos:
+						attack_range = true
 						right_clicked_unit = user_units[i]
 						
 						var hoverflag_1 = true															
@@ -833,3 +923,20 @@ func show_dog_movement_range():
 					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
 					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
 
+func SetLinePoints(line: Line2D, a: Vector2, postA: Vector2, preB: Vector2, b: Vector2):
+	get_node("../Seeker").show()
+	var _a = get_node("../TileMap").local_to_map(a)
+	var _b = get_node("../TileMap").local_to_map(b)		
+	
+	get_node("../Seeker").position = a
+	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
+	var tween: Tween = create_tween()
+	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+	await get_tree().create_timer(1).timeout	
+
+	get_node("../Seeker").hide()		
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
