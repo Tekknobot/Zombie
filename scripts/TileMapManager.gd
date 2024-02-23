@@ -9,6 +9,7 @@ var rng = RandomNumberGenerator.new()
 @export var hovertile: Sprite2D
 @export var zombie_button: Button
 @export var node2D: Node2D
+@export var attacks_container: HBoxContainer
 
 @onready var line_2d = $"../Line2D"
 @onready var post_a = $"../postA"
@@ -35,9 +36,11 @@ var selected_unit_num = 1
 var moving = false
 var clicked_zombie = false
 var right_clicked_unit
+var left_clicked_unit
 
 var only_once = true
 var attack_range = false
+var landmines_range = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -92,6 +95,9 @@ func _process(delta):
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
 
+	
+	
+
 func _input(event):
 	if event is InputEventMouseButton:			
 		if event.button_index == MOUSE_BUTTON_LEFT:	
@@ -112,13 +118,14 @@ func _input(event):
 			user_units.append_array(dogs)			
 			user_units.append_array(humans)			
 			cpu_units.append_array(zombies)
-
+				
 			# Ranged Attack
 			if only_once:
 				for h in all_units.size():					
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
-						
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false:
+					
+					#projectile and melee	
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and landmines_range == false:
 						only_once = false
 						
 						if right_clicked_unit.unit_team == 1:
@@ -190,7 +197,85 @@ func _input(event):
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							
 						only_once = true
-			
+				
+					#landmines
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and landmines_range == true:
+						only_once = false
+						
+						#if right_clicked_unit.unit_team == 1:
+							#right_clicked_unit.attacked = true
+							#right_clicked_unit.moved = true
+						
+						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
+						
+						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_position.x:
+							right_clicked_unit.scale.x = -1	
+						
+						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_position.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_position.x:
+							right_clicked_unit.scale.x = -1																																					
+												
+						right_clicked_unit.get_child(0).play("attack")	
+						
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")		
+						
+						var right_clicked_pos = local_to_map(right_clicked_unit.position)
+						
+						#get_node("../Camera2D").shake(0.5, 30, 3)
+													
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_position.x:	
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("explosion")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+
+						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("explosion")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+								
+						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_position.x:	
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("explosion")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+													
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_position.x:
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("explosion")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+													
+						only_once = true
+						
+				
 			for i in user_units.size():
 				if user_units[i].tile_pos == tile_pos:
 					selected_unit_num = user_units[i].unit_num
@@ -755,6 +840,7 @@ func show_zombie_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 	
 	clicked_zombie = true
+	attacks_container.hide()
 	
 func show_humans_movement_range():
 	#Remove hover tiles										
@@ -775,6 +861,7 @@ func show_humans_movement_range():
 	for i in humans.size():
 		var unit_pos = local_to_map(humans[i].position)
 		if unit_pos == tile_pos:
+			left_clicked_unit = humans[i].position
 			for j in humans[i].unit_movement:
 				
 				var surrounding_cells = get_node("../TileMap").get_surrounding_cells(unit_pos)
@@ -903,6 +990,8 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 	
+	attacks_container.show()
+	
 func show_dog_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -927,6 +1016,8 @@ func show_dog_movement_range():
 				for k in grid_width:
 					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
 					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
+					
+	attacks_container.hide()				
 
 func SetLinePoints(line: Line2D, a: Vector2, postA: Vector2, preB: Vector2, b: Vector2):
 	get_node("../Seeker").show()
@@ -948,9 +1039,89 @@ func SetLinePoints(line: Line2D, a: Vector2, postA: Vector2, preB: Vector2, b: V
 	get_parent().add_child(explosion_instance)
 	explosion_instance.position = explosion_position	
 	explosion_instance.position.y -= 16
-	explosion_instance.z_index = (_b.x + _b.y) + 1000
+	explosion_instance.z_index = (_b.x + _b.y) + 1
 
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+
+func show_humans_landmine_range():				
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+																	
+	var tile_pos = local_to_map(left_clicked_unit)		
+	var tile_data = get_cell_tile_data(0, tile_pos)
+
+	if tile_data is TileData:			
+		for i in user_units.size():
+			var unit_pos = local_to_map(user_units[i].position)
+
+			if unit_pos == tile_pos:
+				attack_range = true
+				right_clicked_unit = user_units[i]
+				
+				var hoverflag_1 = true															
+				for j in 2:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_1 == true:
+						for k in node2D.structures.size():
+							if tile_pos.x-j >= 0:	
+								set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
+									hoverflag_1 = false
+									set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
+									break	
+						
+				var hoverflag_2 = true										
+				for j in 2:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_2 == true:											
+						for k in node2D.structures.size():																						
+							if tile_pos.y+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
+									hoverflag_2 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
+									break
+
+				var hoverflag_3 = true	
+				for j in 2:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_3 == true:											
+						for k in node2D.structures.size():																													
+							if tile_pos.x+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
+									hoverflag_3 = false
+									set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
+									break
+
+				var hoverflag_4 = true	
+				for j in 2:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_4 == true:											
+						for k in node2D.structures.size():																											
+							if tile_pos.y-j >= 0:									
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
+									hoverflag_4 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
+									break
+
+			
+	if tile_pos.x == 0:
+		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == 0:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+	if tile_pos.x == 15:
+		set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == 15:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
+	
+	landmines_range = true
+	
+func _on_landmine_button_pressed():
+	show_humans_landmine_range()
