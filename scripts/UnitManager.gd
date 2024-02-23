@@ -81,7 +81,9 @@ func _process(delta):
 		if unit_pos.x < 0 or unit_pos.x > 15 or unit_pos.y < 0 or unit_pos.y > 15:
 			self.get_child(0).play("death")
 			await get_tree().create_timer(0.5).timeout	
-			self.position.y -= 500							
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")								
 			break
 
 func get_closest_attack_zombies():
