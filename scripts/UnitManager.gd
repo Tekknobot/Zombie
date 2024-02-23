@@ -136,7 +136,7 @@ func _process(delta):
 			only_once = false;	
 			self.get_child(0).play("death")
 			
-			#await get_tree().create_timer(0.5).timeout	
+			await get_tree().create_timer(0.5).timeout	
 			
 			self.position.y -= 500		
 			self.add_to_group("dead")
