@@ -126,7 +126,6 @@ func get_random_numbers(from, to):
 	arr.shuffle()
 	return arr	
 
-
 func _on_spawn_button_pressed():
 	await spawn()
 	#get_node("../TileMap").zombie_attack_ai()

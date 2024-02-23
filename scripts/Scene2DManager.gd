@@ -454,14 +454,17 @@ func check_duplicates(a):
 				var tile_pos_j = Vector2i(j_pos.x, j_pos.y)
 				a[j].get_child(0).modulate = Color8(0, 0, 0)
 				a[j].get_child(0).modulate.a = 0	
-				a[j].z_index = (tile_pos_j.x + tile_pos_j.y) - (tile_pos_j.x + tile_pos_j.y) - 100
+				a[j].z_index = tile_pos_j.x + tile_pos_j.y
+				get_node("../TileMap").astar_grid.set_point_solid(tile_pos_j, false)
 
 				var i_pos = Map.local_to_map(a[i].position)	
 				var i_global = Map.map_to_local(Vector2i(i_pos.x, i_pos.y)) + Vector2(0,0) / 2	
 				a[i].position = i_global
 				var tile_pos_i = Vector2i(i_pos.x, i_pos.y)
 				a[i].get_child(0).modulate = Color8(255, 255, 255)	
+				a[j].get_child(0).modulate.a = 0
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
+				get_node("../TileMap").astar_grid.set_point_solid(tile_pos_i, false)
 
 func add_to_structures():
 	buildings = get_tree().get_nodes_in_group("buildings")
