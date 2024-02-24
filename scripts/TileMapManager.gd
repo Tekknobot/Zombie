@@ -38,9 +38,14 @@ var clicked_zombie = false
 var right_clicked_unit
 var left_clicked_unit
 
+var left_clicked_unit_position
+
 var only_once = true
 var attack_range = false
 var landmines_range = false
+
+var landmines = []
+var all_landmines = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -107,7 +112,7 @@ func _input(event):
 			var tile_data = get_cell_tile_data(0, tile_pos)
 
 			clicked_pos = tile_pos	
-
+			
 			humans = get_tree().get_nodes_in_group("humans")
 			zombies = get_tree().get_nodes_in_group("zombies")
 			dogs = get_tree().get_nodes_in_group("dogs")
@@ -123,6 +128,7 @@ func _input(event):
 			if only_once:
 				for h in all_units.size():					
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+					left_clicked_unit = all_units[h]
 					
 					#projectile and melee	
 					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
@@ -220,7 +226,6 @@ func _input(event):
 						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_position.x:
 							right_clicked_unit.scale.x = -1																																					
 												
-						right_clicked_unit.get_child(0).play("attack")	
 						
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")		
@@ -239,6 +244,10 @@ func _input(event):
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
 							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
+							
 
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
 							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
@@ -250,6 +259,9 @@ func _input(event):
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
 							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
 								
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_position.x:	
 							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
@@ -261,6 +273,9 @@ func _input(event):
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
 							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
 													
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_position.x:
 							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -272,6 +287,9 @@ func _input(event):
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
 							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
 													
 						only_once = true
 						
@@ -281,6 +299,11 @@ func _input(event):
 					selected_unit_num = user_units[i].unit_num
 					selected_pos = user_units[i].tile_pos								
 					break
+					
+			for i in all_landmines.size():
+				var mine_pos = local_to_map(all_landmines[i].position)				
+				if tile_pos == mine_pos:
+					return
 					
 			#Move unit
 			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
@@ -304,7 +327,17 @@ func _input(event):
 					tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)
 					var unit_pos = local_to_map(user_units[selected_unit_num].position)
 					user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y			
-					await get_tree().create_timer(0.25).timeout									
+					await get_tree().create_timer(0.25).timeout	
+					for i in all_landmines.size():
+						var mine_pos = local_to_map(all_landmines[i].position)	
+						var path_pos = local_to_map(tile_center_position)
+						if path_pos	== mine_pos:
+							user_units[selected_unit_num].landmine_collisions()	
+							# Remove hover cells
+							for j in patharray.size():
+								set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)
+								
+							return
 				
 				# Remove hover cells
 				for h in patharray.size():
@@ -610,8 +643,17 @@ func zombie_attack_ai():
 				var unit_pos = local_to_map(zombies[active_zombie].position)
 				zombies[active_zombie].z_index = unit_pos.x + unit_pos.y			
 				await get_tree().create_timer(0.25).timeout
+				for i in all_landmines.size():
+					var mine_pos = local_to_map(all_landmines[i].position)	
+					var path_pos = local_to_map(tile_center_position)
+					if path_pos	== mine_pos:
+						zombies[active_zombie].landmine_collisions()	
+						# Remove hover cells
+						for j in patharray.size():
+							set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)							
+						return				
 				if h == zombies[active_zombie].unit_movement:
-					break		
+					break
 
 							
 			# Remove hover cells
@@ -849,7 +891,7 @@ func show_humans_movement_range():
 	for i in humans.size():
 		var unit_pos = local_to_map(humans[i].position)
 		if unit_pos == tile_pos:
-			left_clicked_unit = humans[i].position
+			left_clicked_unit_position = humans[i].position
 			for j in humans[i].unit_movement:
 				
 				var surrounding_cells = get_node("../TileMap").get_surrounding_cells(unit_pos)
@@ -1040,7 +1082,7 @@ func show_humans_landmine_range():
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
 																	
-	var tile_pos = local_to_map(left_clicked_unit)		
+	var tile_pos = local_to_map(left_clicked_unit_position)		
 	var tile_data = get_cell_tile_data(0, tile_pos)
 
 	if tile_data is TileData:			

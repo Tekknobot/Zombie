@@ -158,23 +158,13 @@ func _process(delta):
 			get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 
 			break
 
-	#Landmine collisions
-	landmines = get_tree().get_nodes_in_group("mines")					
-	for i in landmines.size():
-		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
-		var mine_pos = get_node("../TileMap").local_to_map(landmines[i].position)
-		if unit_center_pos == mine_pos and only_once == true:
-			only_once = false;	
-			self.get_child(0).play("death")
-			
-			await get_tree().create_timer(0.5).timeout	
-			
-			self.position.y -= 500		
-			self.add_to_group("dead")
-			self.remove_from_group("zombies")
 
-			#await get_tree().create_timer(0).timeout
-			
+func landmine_collisions():					
+	for i in get_node("../TileMap").all_landmines.size():
+		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
+		var mine_pos = get_node("../TileMap").local_to_map(get_node("../TileMap").all_landmines[i].position)
+		if unit_center_pos == mine_pos and only_once == true:
+			only_once = false;				
 			var explosion = preload("res://scenes/vfx/explosion.scn")
 			var explosion_instance = explosion.instantiate()
 			var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
@@ -183,9 +173,11 @@ func _process(delta):
 			explosion_instance.position = explosion_position	
 			explosion_instance.position.y -= 16
 			explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
-					
-			landmines[i].position.y -= 500
-			break
+			get_node("../TileMap").all_landmines[i].position.y -= 500
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")	
+			self.get_child(0).play("death")		
 
 
 func get_closest_attack_zombies():
