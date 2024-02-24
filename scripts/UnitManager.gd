@@ -177,7 +177,8 @@ func landmine_collisions():
 			self.position.y -= 500		
 			self.add_to_group("dead")
 			self.remove_from_group("zombies")	
-			self.get_child(0).play("death")		
+			self.get_child(0).play("death")	
+			get_node("../TileMap").landmines_total -= 1	
 
 
 func get_closest_attack_zombies():
