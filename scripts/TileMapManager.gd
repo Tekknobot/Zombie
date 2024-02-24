@@ -125,7 +125,7 @@ func _input(event):
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 					
 					#projectile and melee	
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and landmines_range == false:
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
 						only_once = false
 						
 						if right_clicked_unit.unit_team == 1:
@@ -199,7 +199,7 @@ func _input(event):
 						only_once = true
 				
 					#landmines
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and landmines_range == true:
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true:
 						only_once = false
 						
 						#if right_clicked_unit.unit_team == 1:
@@ -313,8 +313,6 @@ func _input(event):
 				for i in user_units.size():
 					user_units[i].get_child(0).play("default")
 					tile_pos = null
-				
-				user_units[selected_unit_num].moved = true
 					
 				for i in user_units.size():	
 					var surrounding_cells = get_surrounding_cells(target_pos)
@@ -356,8 +354,7 @@ func _input(event):
 							return
 						else:
 							all_units[i].selected = false
-							
-							
+														
 			for i in all_units.size():					
 				if all_units[i].unit_type == "Dog" and all_units[i].moved == false:		
 					#Place hover tiles		
@@ -371,11 +368,6 @@ func _input(event):
 							return
 						else:
 							all_units[i].selected = false
-				else:
-					#Remove hover tiles										
-					for j in grid_height:
-						for k in grid_width:
-							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 									
 			for i in user_units.size():
 				if user_units[selected_unit_num].moved == false:
@@ -390,12 +382,7 @@ func _input(event):
 							attack_range = false
 							return	
 						else:
-							user_units[selected_unit_num].selected = false	
-				else:
-					#Remove hover tiles										
-					for j in grid_height:
-						for k in grid_width:
-							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)																		
+							user_units[selected_unit_num].selected = false																		
 
 		if event.button_index == MOUSE_BUTTON_RIGHT:				
 			#Remove hover tiles										
@@ -414,6 +401,7 @@ func _input(event):
 
 					if unit_pos == tile_pos:
 						attack_range = true
+						landmines_range = false
 						right_clicked_unit = user_units[i]
 						
 						var hoverflag_1 = true															
@@ -1122,6 +1110,7 @@ func show_humans_landmine_range():
 		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
 	
 	landmines_range = true
+	attack_range = false
 	
 func _on_landmine_button_pressed():
 	show_humans_landmine_range()
