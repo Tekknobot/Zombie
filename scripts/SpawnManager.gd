@@ -113,7 +113,7 @@ func spawn():
 		var zomb = zombie.instantiate()
 		node2D.add_child(zomb)
 		zomb.add_to_group("zombies")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[i]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		zomb.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(zomb, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	

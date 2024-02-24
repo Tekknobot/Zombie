@@ -367,8 +367,8 @@ func _input(event):
 							var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
 							await get_tree().create_timer(0.25).timeout	
+										
 					
-					_on_zombie()					
 						
 					# Remove hover cells
 					for h in patharray.size():
@@ -404,8 +404,11 @@ func _input(event):
 									cpu_units[j].remove_from_group("zombies")
 						
 									user_units[selected_unit_num].moved = true
-									return						
-				
+									_on_zombie()
+									return
+									
+					_on_zombie()						
+					
 				only_once = true
 						
 				#Show movement range	
