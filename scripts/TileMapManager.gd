@@ -102,348 +102,366 @@ func _process(delta):
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
 
-	
-	print(landmines_total)
 
 func _input(event):
 	if event is InputEventMouseButton:			
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true:	
-			var mouse_pos = get_global_mouse_position()
-			mouse_pos.y += 8
-			var tile_pos = local_to_map(mouse_pos)	
-			var tile_data = get_cell_tile_data(0, tile_pos)
+			if event.pressed:
+				var mouse_pos = get_global_mouse_position()
+				mouse_pos.y += 8
+				var tile_pos = local_to_map(mouse_pos)	
+				var tile_data = get_cell_tile_data(0, tile_pos)
 
-			clicked_pos = tile_pos	
-			
-			humans = get_tree().get_nodes_in_group("humans")
-			zombies = get_tree().get_nodes_in_group("zombies")
-			dogs = get_tree().get_nodes_in_group("dogs")
-			
-			all_units.append_array(humans)
-			all_units.append_array(zombies)
-			all_units.append_array(dogs)			
-			user_units.append_array(dogs)			
-			user_units.append_array(humans)			
-			cpu_units.append_array(zombies)
+				clicked_pos = tile_pos	
 				
-			# Ranged Attack
-			for h in all_units.size():					
-				var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
-				left_clicked_unit = all_units[h]
+				humans = get_tree().get_nodes_in_group("humans")
+				zombies = get_tree().get_nodes_in_group("zombies")
+				dogs = get_tree().get_nodes_in_group("dogs")
 				
-				#projectile and melee	
-				if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
-					only_once = false
+				all_units.append_array(humans)
+				all_units.append_array(zombies)
+				all_units.append_array(dogs)			
+				user_units.append_array(dogs)			
+				user_units.append_array(humans)			
+				cpu_units.append_array(zombies)
 					
-					if right_clicked_unit.unit_team == 1:
-						right_clicked_unit.attacked = true
-						right_clicked_unit.moved = true
+				# Ranged Attack
+				for h in all_units.size():					
+					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+					left_clicked_unit = all_units[h]
 					
-					var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
-					
-					if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
-						right_clicked_unit.scale.x = 1
-					
-					elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_pos.x:
-						right_clicked_unit.scale.x = -1	
-					
-					if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_pos.x:
-						right_clicked_unit.scale.x = 1
-					
-					elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_pos.x:
-						right_clicked_unit.scale.x = -1																																					
-											
-					right_clicked_unit.get_child(0).play("attack")	
-					
-					await get_tree().create_timer(0.1).timeout
-					right_clicked_unit.get_child(0).play("default")		
-					
-					var _bumpedvector = clicked_pos
-					var right_clicked_pos = local_to_map(right_clicked_unit.position)
-					
-					#get_node("../Camera2D").shake(0.5, 30, 3)
-					
-					
-					await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(0,0), Vector2(0,0), Vector2(all_units[h].position.x,all_units[h].position.y-16))
-					all_units[h].get_child(0).set_offset(Vector2(0,0))
-												
-					if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
-						var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2
-						get_node("../TileMap").all_units[h].position = clicked_pos
-						all_units[h].position = tile_center_pos	
-						var unit_pos = local_to_map(all_units[h].position)										
-						all_units[h].z_index = unit_pos.x + unit_pos.y	
-						var tween: Tween = create_tween()
-						tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-
-					if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
-						var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
-						get_node("../TileMap").all_units[h].position = clicked_pos
-						all_units[h].position = tile_center_pos	
-						var unit_pos = local_to_map(all_units[h].position)										
-						all_units[h].z_index = unit_pos.x + unit_pos.y
-						var tween: Tween = create_tween()
-						tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
-
-					if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
-						var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
-						get_node("../TileMap").all_units[h].position = clicked_pos
-						all_units[h].position = tile_center_pos	
-						var unit_pos = local_to_map(all_units[h].position)										
-						all_units[h].z_index = unit_pos.x + unit_pos.y
-						var tween: Tween = create_tween()
-						tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
-					
-					if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
-						var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
-						get_node("../TileMap").all_units[h].position = clicked_pos
-						all_units[h].position = tile_center_pos	
-						var unit_pos = local_to_map(all_units[h].position)										
-						all_units[h].z_index = unit_pos.x + unit_pos.y		
-						var tween: Tween = create_tween()
-						tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+					#projectile and melee	
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
+						only_once = false
 						
-					only_once = true
-			
-				#landmines
-				if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true and only_once == true and landmines_total <= 8:
-					only_once = false
-					
-					#if right_clicked_unit.unit_team == 1:
-						#right_clicked_unit.attacked = true
-						#right_clicked_unit.moved = true
-					
-					var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
-					
-					if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
-						right_clicked_unit.scale.x = 1
-					
-					elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_position.x:
-						right_clicked_unit.scale.x = -1	
-					
-					if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_position.x:
-						right_clicked_unit.scale.x = 1
-					
-					elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_position.x:
-						right_clicked_unit.scale.x = -1																																					
-											
-					
-					await get_tree().create_timer(0.1).timeout
-					right_clicked_unit.get_child(0).play("default")		
-					
-					var right_clicked_pos = local_to_map(right_clicked_unit.position)
-					
-					#get_node("../Camera2D").shake(0.5, 30, 3)
-												
-					if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_position.x:	
-						var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
-						var landmine = preload("res://scenes/mines/landmine.scn")
-						var landmine_instance = landmine.instantiate()
-						var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-						landmine_instance.set_name("landmine")
-						get_parent().add_child(landmine_instance)
-						landmine_instance.position = landmine_position	
-						landmine_instance.z_index = clicked_pos.x + clicked_pos.y
-						landmine_instance.add_to_group("mines")
-						landmines = get_tree().get_nodes_in_group("mines")
-						all_landmines.append_array(landmines)
-						left_clicked_unit.get_child(0).play("default")					
+						if right_clicked_unit.unit_team == 1:
+							right_clicked_unit.attacked = true
+							right_clicked_unit.moved = true
 						
-					if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
-						var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
-						var landmine = preload("res://scenes/mines/landmine.scn")
-						var landmine_instance = landmine.instantiate()
-						var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-						landmine_instance.set_name("landmine")
-						get_parent().add_child(landmine_instance)
-						landmine_instance.position = landmine_position	
-						landmine_instance.z_index = clicked_pos.x + clicked_pos.y
-						landmine_instance.add_to_group("mines")
-						landmines = get_tree().get_nodes_in_group("mines")
-						all_landmines.append_array(landmines)
-						left_clicked_unit.get_child(0).play("default")	
+						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
+						
+						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1	
+						
+						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1																																					
+												
+						right_clicked_unit.get_child(0).play("attack")	
+						
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")		
+						
+						var _bumpedvector = clicked_pos
+						var right_clicked_pos = local_to_map(right_clicked_unit.position)
+						
+						#get_node("../Camera2D").shake(0.5, 30, 3)
+						
+						
+						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(0,0), Vector2(0,0), Vector2(all_units[h].position.x,all_units[h].position.y-16))
+						all_units[h].get_child(0).set_offset(Vector2(0,0))
+													
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y	
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+
+						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
+
+						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
+						
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y		
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							
-					if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_position.x:	
-						var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
-						var landmine = preload("res://scenes/mines/landmine.scn")
-						var landmine_instance = landmine.instantiate()
-						var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-						landmine_instance.set_name("landmine")
-						get_parent().add_child(landmine_instance)
-						landmine_instance.position = landmine_position	
-						landmine_instance.z_index = clicked_pos.x + clicked_pos.y
-						landmine_instance.add_to_group("mines")
-						landmines = get_tree().get_nodes_in_group("mines")
-						all_landmines.append_array(landmines)
-						left_clicked_unit.get_child(0).play("default")	
-												
-					if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_position.x:
-						var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
-						var landmine = preload("res://scenes/mines/landmine.scn")
-						var landmine_instance = landmine.instantiate()
-						var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-						landmine_instance.set_name("landmine")
-						get_parent().add_child(landmine_instance)
-						landmine_instance.position = landmine_position	
-						landmine_instance.z_index = clicked_pos.x + clicked_pos.y
-						landmine_instance.add_to_group("mines")
-						landmines = get_tree().get_nodes_in_group("mines")
-						all_landmines.append_array(landmines)
-						left_clicked_unit.get_child(0).play("default")	
-					
-					landmines_total += 1								
-						
+						only_once = true
 				
-			for i in user_units.size():
-				if user_units[i].tile_pos == tile_pos:
-					selected_unit_num = user_units[i].unit_num
-					selected_pos = user_units[i].tile_pos								
-					break
-					
-			for i in all_landmines.size():
-				var mine_pos = local_to_map(all_landmines[i].position)				
-				if tile_pos == mine_pos:
-					return
-					
-			#Move unit
-			if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
-				#Remove hover tiles										
-				for j in grid_height:
-					for k in grid_width:
-						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-										
-				target_pos = tile_pos 
-				var patharray = astar_grid.get_point_path(selected_pos, target_pos)
-
-				# Find path and set hover cells
-				for h in patharray.size():
-					set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)	
-										
-				# Move unit		
-				for h in patharray.size():		
-					user_units[selected_unit_num].get_child(0).play("move")						
-					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
-					var unit_pos = local_to_map(user_units[selected_unit_num].position)
-					user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y														
-					for i in all_landmines.size():
-						var mine_pos = local_to_map(all_landmines[i].position)	
-						var path_pos = local_to_map(tile_center_position)
-						if path_pos	== mine_pos and path_interupted == false:
-							var patharray_new = astar_grid.get_point_path(mine_pos, mine_pos)
-							for j in patharray_new.size():
-								var tile_center_position_new = map_to_local(patharray_new[j]) + Vector2(0,0) / 2
-								var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
-								user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
-								path_interupted = true
-								#var explosion = preload("res://scenes/vfx/explosion.scn")
-								#var explosion_instance = explosion.instantiate()
-								#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
-								#explosion_instance.set_name("explosion")
-								#get_parent().add_child(explosion_instance)
-								#explosion_instance.position = explosion_position	
-								#explosion_instance.position.y -= 16
-								#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
-								var tween = create_tween()
-								tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
-								get_node("../TileMap").all_landmines[i].position.y -= 500		
-								#user_units[selected_unit_num].position.y -= 500		
-								#user_units[selected_unit_num].add_to_group("dead")
-								#user_units[selected_unit_num].remove_from_group("zombies")	
-								#user_units[selected_unit_num].get_child(0).play("death")	
-								landmines_total -= 1		
-						else:
-							path_interupted = false
+					#landmines
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true and only_once == true and landmines_total <= 6:
+						only_once = false
+						
+						#if right_clicked_unit.unit_team == 1:
+							#right_clicked_unit.attacked = true
+							#right_clicked_unit.moved = true
+						
+						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
+						
+						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_position.x:
+							right_clicked_unit.scale.x = -1	
+						
+						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_position.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_position.x:
+							right_clicked_unit.scale.x = -1																																					
+												
+						
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")		
+						
+						var right_clicked_pos = local_to_map(right_clicked_unit.position)
+						
+						#get_node("../Camera2D").shake(0.5, 30, 3)
+													
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_position.x:	
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("landmine")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")					
 							
-					if path_interupted == true:
-						return
-					else:		
-						user_units[selected_unit_num].get_child(0).play("move")						
-						var tile_center_position_2 = map_to_local(patharray[h]) + Vector2(0,0) / 2
-						var tween = create_tween()
-						tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_2, 0.25)
-						var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
-						user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
-						await get_tree().create_timer(0.25).timeout						
+						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("landmine")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
+								
+						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_position.x:	
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("landmine")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
+													
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_position.x:
+							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							var landmine = preload("res://scenes/mines/landmine.scn")
+							var landmine_instance = landmine.instantiate()
+							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
+							landmine_instance.set_name("landmine")
+							get_parent().add_child(landmine_instance)
+							landmine_instance.position = landmine_position	
+							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
+							landmine_instance.add_to_group("mines")
+							landmines = get_tree().get_nodes_in_group("mines")
+							all_landmines.append_array(landmines)
+							left_clicked_unit.get_child(0).play("default")	
+						
+						landmines_total += 1								
+							
 					
-				# Remove hover cells
-				for h in patharray.size():
-					set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
-		
 				for i in user_units.size():
-					user_units[i].get_child(0).play("default")
-					tile_pos = null
-					
-				for i in user_units.size():	
-					var surrounding_cells = get_surrounding_cells(target_pos)
-					for k in surrounding_cells.size():
-						for j in cpu_units.size():
-							var attack_center_pos = local_to_map(cpu_units[j].position)
-							var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2
-							if surrounding_cells[k] == attack_center_pos and !cpu_units[j].is_in_group("dead"):					
-								if user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x > attack_center_position.x:
-									user_units[selected_unit_num].scale.x = 1
-								elif user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x < attack_center_position.x:
-									user_units[selected_unit_num].scale.x = -1	
-								if user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x > attack_center_position.x:
-									user_units[selected_unit_num].scale.x = 1
-								elif user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x < attack_center_position.x:
-									user_units[selected_unit_num].scale.x = -1						
-				
-								user_units[selected_unit_num].get_child(0).play("attack")
-								var tween: Tween = create_tween()
-								tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)			
-								await get_tree().create_timer(1).timeout
-								cpu_units[j].get_child(0).play("death")
-								user_units[selected_unit_num].get_child(0).play("default")	
-								cpu_units[j].add_to_group("dead")
-								cpu_units[j].remove_from_group("zombies")
-					
-								user_units[selected_unit_num].moved = true
-								return						
+					if user_units[i].tile_pos == tile_pos:
+						selected_unit_num = user_units[i].unit_num
+						selected_pos = user_units[i].tile_pos								
+						break
+						
+				for i in all_landmines.size():
+					var mine_pos = local_to_map(all_landmines[i].position)				
+					if tile_pos == mine_pos:
+						return
+						
+				#Move unit
+				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
+					#Remove hover tiles										
+					for j in grid_height:
+						for k in grid_width:
+							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+											
+					target_pos = tile_pos 
+					var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+
+					# Find path and set hover cells
+					for h in patharray.size():
+						set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)	
+											
+					# Move unit		
+					for h in patharray.size():		
+						user_units[selected_unit_num].get_child(0).play("move")						
+						var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+						var unit_pos = local_to_map(user_units[selected_unit_num].position)
+						user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y														
+						for i in all_landmines.size():
+							var mine_pos = local_to_map(all_landmines[i].position)	
+							var path_pos = local_to_map(tile_center_position)
+							if path_pos	== mine_pos and path_interupted == false:
+								var patharray_new = astar_grid.get_point_path(mine_pos, mine_pos)
+								for j in patharray_new.size():
+									var tile_center_position_new = map_to_local(patharray_new[j]) + Vector2(0,0) / 2
+									var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
+									user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
+									path_interupted = true
+									#var explosion = preload("res://scenes/vfx/explosion.scn")
+									#var explosion_instance = explosion.instantiate()
+									#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
+									#explosion_instance.set_name("explosion")
+									#get_parent().add_child(explosion_instance)
+									#explosion_instance.position = explosion_position	
+									#explosion_instance.position.y -= 16
+									#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
+									var tween = create_tween()
+									tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
+									get_node("../TileMap").all_landmines[i].position.y -= 500		
+									#user_units[selected_unit_num].position.y -= 500		
+									#user_units[selected_unit_num].add_to_group("dead")
+									#user_units[selected_unit_num].remove_from_group("zombies")	
+									#user_units[selected_unit_num].get_child(0).play("death")	
+									landmines_total -= 1		
+							else:
+								path_interupted = false
+								
+						if path_interupted == true:
+							return
+							
+						if path_interupted == false:		
+							user_units[selected_unit_num].get_child(0).play("move")						
+							var tile_center_position_2 = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var tween = create_tween()
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_2, 0.25)
+							var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
+							user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
+							await get_tree().create_timer(0.25).timeout						
+						
+					# Remove hover cells
+					for h in patharray.size():
+						set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
 			
-			only_once = true
+					for i in user_units.size():
+						user_units[i].get_child(0).play("default")
+						tile_pos = null
+						
+					for i in user_units.size():	
+						var surrounding_cells = get_surrounding_cells(target_pos)
+						for k in surrounding_cells.size():
+							for j in cpu_units.size():
+								var attack_center_pos = local_to_map(cpu_units[j].position)
+								var attack_center_position = map_to_local(attack_center_pos) + Vector2(0,0) / 2
+								if surrounding_cells[k] == attack_center_pos and !cpu_units[j].is_in_group("dead"):					
+									if user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x > attack_center_position.x:
+										user_units[selected_unit_num].scale.x = 1
+									elif user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x < attack_center_position.x:
+										user_units[selected_unit_num].scale.x = -1	
+									if user_units[selected_unit_num].scale.x == -1 and user_units[selected_unit_num].position.x > attack_center_position.x:
+										user_units[selected_unit_num].scale.x = 1
+									elif user_units[selected_unit_num].scale.x == 1 and user_units[selected_unit_num].position.x < attack_center_position.x:
+										user_units[selected_unit_num].scale.x = -1						
 					
-			#Show movement range	
-			for i in all_units.size():				
-				if all_units[i].unit_type == "Zombie":		
-					#Place hover tiles		
-					for j in zombies.size():
-						var unit_pos = local_to_map(zombies[j].position)
-						if unit_pos == tile_pos and attack_range == false:					
-							show_zombie_movement_range()
-							all_units[i].selected = false
-							return
-						else:
-							all_units[i].selected = false
-														
-			for i in all_units.size():					
-				if all_units[i].unit_type == "Dog" and all_units[i].moved == false:		
-					#Place hover tiles		
-					for j in dogs.size():
-						var unit_pos = local_to_map(dogs[j].position)
-						if unit_pos == tile_pos:					
-							show_dog_movement_range()	
-							all_units[i].selected = true
-							clicked_zombie = false
-							attack_range = false
-							return
-						else:
-							all_units[i].selected = false
-									
-			for i in user_units.size():
-				if user_units[selected_unit_num].moved == false:
-					user_units[i].get_child(0).play("default")					
-					#Place hover tiles		
-					for j in humans.size():
-						var unit_pos = local_to_map(humans[j].position)
-						if unit_pos == tile_pos:
-							show_humans_movement_range()
-							user_units[selected_unit_num].selected = true
-							clicked_zombie = false
-							attack_range = false
-							return	
-						else:
-							user_units[selected_unit_num].selected = false																		
+									user_units[selected_unit_num].get_child(0).play("attack")
+									var tween: Tween = create_tween()
+									tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)			
+									await get_tree().create_timer(1).timeout
+									cpu_units[j].get_child(0).play("death")
+									user_units[selected_unit_num].get_child(0).play("default")	
+									cpu_units[j].add_to_group("dead")
+									cpu_units[j].remove_from_group("zombies")
+						
+									user_units[selected_unit_num].moved = true
+									return						
+				
+				only_once = true
+						
+				#Show movement range	
+				for i in all_units.size():				
+					if all_units[i].unit_type == "Zombie":		
+						#Place hover tiles		
+						for j in zombies.size():
+							var unit_pos = local_to_map(zombies[j].position)
+							if unit_pos == tile_pos and attack_range == false:					
+								show_zombie_movement_range()
+								all_units[i].selected = false
+								return
+							elif landmines_range == true:
+								pass
+							elif landmines_range == false:
+								all_units[i].selected = false
+								#Remove hover tiles										
+								for m in grid_height:
+									for n in grid_width:
+										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)
+																								
+				for i in all_units.size():					
+					if all_units[i].unit_type == "Dog" and all_units[i].moved == false:		
+						#Place hover tiles		
+						for j in dogs.size():
+							var unit_pos = local_to_map(dogs[j].position)
+							if unit_pos == tile_pos:					
+								show_dog_movement_range()	
+								all_units[i].selected = true
+								clicked_zombie = false
+								attack_range = false
+								return
+							elif landmines_range == true:
+								pass
+							elif landmines_range == false:
+								all_units[i].selected = false
+								#Remove hover tiles										
+								for m in grid_height:
+									for n in grid_width:
+										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)
+																			
+				for i in user_units.size():
+					if user_units[selected_unit_num].moved == false:
+						user_units[i].get_child(0).play("default")					
+						#Place hover tiles		
+						for j in humans.size():
+							var unit_pos = local_to_map(humans[j].position)
+							if unit_pos == tile_pos:
+								show_humans_movement_range()
+								user_units[selected_unit_num].selected = true
+								clicked_zombie = false
+								attack_range = false
+								return	
+							elif landmines_range == true:
+								pass
+							elif landmines_range == false:
+								user_units[selected_unit_num].selected = false
+								#Remove hover tiles										
+								for m in grid_height:
+									for n in grid_width:
+										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)																									
 
 		if event.button_index == MOUSE_BUTTON_RIGHT:				
 			#Remove hover tiles										
@@ -526,9 +544,10 @@ func _input(event):
 		if event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_LEFT:
 				if event.pressed:
-					print("Left button was clicked at ", event.position)
+					#print("Left button was clicked at ", event.position)
+					pass
 				else:
-					print("Left button was released")
+					#print("Left button was released")
 					only_once = true
 				
 func dog_attack_ai():
