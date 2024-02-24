@@ -201,11 +201,12 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y		
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-							
+						
+						_on_zombie()	
 						only_once = true
 				
 					#landmines
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true and only_once == true and landmines_total <= 6:
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true and only_once == true:
 						only_once = false
 						
 						#if right_clicked_unit.unit_team == 1:
@@ -290,6 +291,7 @@ func _input(event):
 							all_landmines.append_array(landmines)
 							left_clicked_unit.get_child(0).play("default")	
 						
+						_on_zombie()
 						landmines_total += 1								
 							
 					
@@ -350,6 +352,7 @@ func _input(event):
 									#user_units[selected_unit_num].remove_from_group("zombies")	
 									#user_units[selected_unit_num].get_child(0).play("death")	
 									landmines_total -= 1		
+									_on_zombie()
 							else:
 								path_interupted = false
 								
@@ -363,7 +366,9 @@ func _input(event):
 							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_2, 0.25)
 							var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
-							await get_tree().create_timer(0.25).timeout						
+							await get_tree().create_timer(0.25).timeout	
+					
+					_on_zombie()					
 						
 					# Remove hover cells
 					for h in patharray.size():
@@ -461,7 +466,9 @@ func _input(event):
 								#Remove hover tiles										
 								for m in grid_height:
 									for n in grid_width:
-										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)																									
+										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)	
+				
+																												
 
 		if event.button_index == MOUSE_BUTTON_RIGHT:				
 			#Remove hover tiles										
@@ -672,42 +679,44 @@ func humans_attack_ai():
 			
 func zombie_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
-	var active_zombie = rng.randi_range(0,zombies.size()-1)
+	humans = get_tree().get_nodes_in_group("humans")
+	var closest_zombie_to_human = humans[rng.randi_range(0,humans.size()-1)].get_closest_attack_zombies()
+	#var active_zombie = rng.randi_range(0,zombies.size()-1)
 	var target_human = rng.randi_range(0,humans.size()-1)			
-	if !zombies[active_zombie].is_in_group("dead") and !humans[target_human].is_in_group("dead"):
-		var closest_atack = zombies[active_zombie].get_closest_attack_humans()										
+	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
+		var closest_atack = closest_zombie_to_human.get_closest_attack_humans()										
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
 		
-		zombies[active_zombie].get_child(0).play("move")
+		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1: 
-			var patharray = astar_grid.get_point_path(zombies[active_zombie].tile_pos, zombie_surrounding_cells[open_tile])
+			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
 				await get_tree().create_timer(0.01).timeout
 				set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)
-				if h == zombies[active_zombie].unit_movement:
+				if h == closest_zombie_to_human.unit_movement:
 					get_node("../TileMap").set_cell(1, patharray[h], 18, Vector2i(0, 0), 0)			
 				
 			# Move unit		
 			for h in patharray.size():
 				var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 				var tween = create_tween()
-				tween.tween_property(zombies[active_zombie], "position", tile_center_position, 0.25)
-				var unit_pos = local_to_map(zombies[active_zombie].position)
-				zombies[active_zombie].z_index = unit_pos.x + unit_pos.y			
+				tween.tween_property(closest_zombie_to_human, "position", tile_center_position, 0.25)
+				var unit_pos = local_to_map(closest_zombie_to_human.position)
+				closest_zombie_to_human.z_index = unit_pos.x + unit_pos.y			
 				await get_tree().create_timer(0.25).timeout
 				for i in all_landmines.size():
 					var mine_pos = local_to_map(all_landmines[i].position)	
 					var path_pos = local_to_map(tile_center_position)
 					if path_pos	== mine_pos:
-						zombies[active_zombie].landmine_collisions()	
+						closest_zombie_to_human.landmine_collisions()	
 						# Remove hover cells
 						for j in patharray.size():
 							set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)							
 						return				
-				if h == zombies[active_zombie].unit_movement:
+				if h == closest_zombie_to_human.unit_movement:
 					break
 
 							
@@ -715,24 +724,24 @@ func zombie_attack_ai():
 			for h in patharray.size():
 				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
 			
-			zombies[active_zombie].get_child(0).play("default")	
+			closest_zombie_to_human.get_child(0).play("default")	
 			
 			for i in 4:
-				var zombies_pos = local_to_map(zombies[active_zombie].position)
+				var zombies_pos = local_to_map(closest_zombie_to_human.position)
 				if zombies_pos == zombie_surrounding_cells[i]:
 					var attack_center_position = map_to_local(zombie_target_pos) + Vector2(0,0) / 2	
 								
-					if zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x > attack_center_position.x:
-						zombies[active_zombie].scale.x = 1
-					elif zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x < attack_center_position.x:
-						zombies[active_zombie].scale.x = -1	
-					if zombies[active_zombie].scale.x == -1 and zombies[active_zombie].position.x > attack_center_position.x:
-						zombies[active_zombie].scale.x = 1
-					elif zombies[active_zombie].scale.x == 1 and zombies[active_zombie].position.x < attack_center_position.x:
-						zombies[active_zombie].scale.x = -1						
+					if closest_zombie_to_human.scale.x == 1 and closest_zombie_to_human.position.x > attack_center_position.x:
+						closest_zombie_to_human.scale.x = 1
+					elif closest_zombie_to_human.scale.x == -1 and closest_zombie_to_human.position.x < attack_center_position.x:
+						closest_zombie_to_human.scale.x = -1	
+					if closest_zombie_to_human.scale.x == -1 and closest_zombie_to_human.position.x > attack_center_position.x:
+						closest_zombie_to_human.scale.x = 1
+					elif closest_zombie_to_human.scale.x == 1 and closest_zombie_to_human.position.x < attack_center_position.x:
+						closest_zombie_to_human.scale.x = -1						
 		
 
-					zombies[active_zombie].get_child(0).play("attack")
+					closest_zombie_to_human.get_child(0).play("attack")
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
 					await get_tree().create_timer(1).timeout
@@ -741,7 +750,7 @@ func zombie_attack_ai():
 					closest_atack.add_to_group("dead")
 					closest_atack.remove_from_group("humans")
 					closest_atack.position.y -= 500
-					zombies[active_zombie].get_child(0).play("default")	
+					closest_zombie_to_human.get_child(0).play("default")	
 					break	
 			
 func _on_zombie_button_pressed():
@@ -1211,3 +1220,19 @@ func show_humans_landmine_range():
 	
 func _on_landmine_button_pressed():
 	show_humans_landmine_range()
+
+func _on_zombie():
+	zombie_button.hide()
+	
+	for i in user_units.size():
+		modulate = Color8(255, 255, 255)
+		user_units[i].moved = false
+		user_units[i].attacked = false
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			
+	await zombie_attack_ai()
+	
