@@ -159,12 +159,12 @@ func _process(delta):
 			break
 
 
-func landmine_collisions():					
-	for i in get_node("../TileMap").all_landmines.size():
-		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
+func landmine_collisions():			
+	var unit_center_pos = get_node("../TileMap").local_to_map(self.position)		
+	for i in get_node("../TileMap").all_landmines.size():		
 		var mine_pos = get_node("../TileMap").local_to_map(get_node("../TileMap").all_landmines[i].position)
-		if unit_center_pos == mine_pos and only_once == true:
-			only_once = false;				
+		if unit_center_pos == mine_pos and only_once == true:		
+			only_once == false		
 			var explosion = preload("res://scenes/vfx/explosion.scn")
 			var explosion_instance = explosion.instantiate()
 			var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2

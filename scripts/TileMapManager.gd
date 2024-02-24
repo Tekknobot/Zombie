@@ -46,6 +46,7 @@ var landmines_range = false
 
 var landmines = []
 var all_landmines = []
+var path_interupted = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -239,7 +240,7 @@ func _input(event):
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-							landmine_instance.set_name("explosion")
+							landmine_instance.set_name("landmine")
 							get_parent().add_child(landmine_instance)
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
@@ -248,13 +249,12 @@ func _input(event):
 							all_landmines.append_array(landmines)
 							left_clicked_unit.get_child(0).play("default")	
 							
-
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
 							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-							landmine_instance.set_name("explosion")
+							landmine_instance.set_name("landmine")
 							get_parent().add_child(landmine_instance)
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
@@ -268,7 +268,7 @@ func _input(event):
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-							landmine_instance.set_name("explosion")
+							landmine_instance.set_name("landmine")
 							get_parent().add_child(landmine_instance)
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
@@ -282,7 +282,7 @@ func _input(event):
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
-							landmine_instance.set_name("explosion")
+							landmine_instance.set_name("landmine")
 							get_parent().add_child(landmine_instance)
 							landmine_instance.position = landmine_position	
 							landmine_instance.z_index = clicked_pos.x + clicked_pos.y
@@ -320,25 +320,50 @@ func _input(event):
 					set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)	
 										
 				# Move unit		
-				for h in patharray.size():
+				for h in patharray.size():		
 					user_units[selected_unit_num].get_child(0).play("move")						
 					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
-					var tween = create_tween()
-					tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)
 					var unit_pos = local_to_map(user_units[selected_unit_num].position)
-					user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y			
-					await get_tree().create_timer(0.25).timeout	
+					user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y														
 					for i in all_landmines.size():
 						var mine_pos = local_to_map(all_landmines[i].position)	
 						var path_pos = local_to_map(tile_center_position)
-						if path_pos	== mine_pos:
-							user_units[selected_unit_num].landmine_collisions()	
-							# Remove hover cells
-							for j in patharray.size():
-								set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)
-								
-							return
-				
+						if path_pos	== mine_pos and path_interupted == false:
+							var patharray_new = astar_grid.get_point_path(mine_pos, mine_pos)
+							for j in patharray_new.size():
+								var tile_center_position_new = map_to_local(patharray_new[j]) + Vector2(0,0) / 2
+								var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
+								user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
+								path_interupted = true
+								#var explosion = preload("res://scenes/vfx/explosion.scn")
+								#var explosion_instance = explosion.instantiate()
+								#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
+								#explosion_instance.set_name("explosion")
+								#get_parent().add_child(explosion_instance)
+								#explosion_instance.position = explosion_position	
+								#explosion_instance.position.y -= 16
+								#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
+								var tween = create_tween()
+								tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
+								get_node("../TileMap").all_landmines[i].position.y -= 500		
+								#user_units[selected_unit_num].position.y -= 500		
+								#user_units[selected_unit_num].add_to_group("dead")
+								#user_units[selected_unit_num].remove_from_group("zombies")	
+								#user_units[selected_unit_num].get_child(0).play("death")		
+						else:
+							path_interupted = false
+							
+					if path_interupted == true:
+						return
+					else:		
+						user_units[selected_unit_num].get_child(0).play("move")						
+						var tile_center_position_2 = map_to_local(patharray[h]) + Vector2(0,0) / 2
+						var tween = create_tween()
+						tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_2, 0.25)
+						var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
+						user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
+						await get_tree().create_timer(0.25).timeout						
+					
 				# Remove hover cells
 				for h in patharray.size():
 					set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
