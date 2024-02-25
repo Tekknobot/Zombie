@@ -14,6 +14,8 @@ var moves = {N: Vector2i(0, -1),
 			 W: Vector2i(-1, 0)}
 			
 @onready var Map = $TileMap
+@onready var SpawnManager = $SpawnManager
+
 @export var spawn_button : Button
 
 var building = preload("res://scenes/building.scn")
@@ -449,6 +451,7 @@ func add_to_structures_array():
 	
 	check_duplicates(structures)
 	#print(structures.size())
+	SpawnManager.spawn()
 
 func check_duplicates(a):
 	var is_dupe = false
