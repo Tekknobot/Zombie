@@ -451,7 +451,6 @@ func add_to_structures_array():
 	
 	check_duplicates(structures)
 	#print(structures.size())
-	SpawnManager.spawn()
 
 func check_duplicates(a):
 	var is_dupe = false
