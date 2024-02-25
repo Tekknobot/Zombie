@@ -101,22 +101,21 @@ func _process(delta):
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
 	
-	
 	# Check if off map
-	for i in get_node("../TileMap").all_units.size():
-		var unit_center_position = get_node("../TileMap").all_units[i].position
+	for i in get_node("../TileMap").cpu_units.size():
+		var unit_center_position = get_node("../TileMap").cpu_units[i].position
 		var unit_position = get_node("../TileMap").local_to_map(unit_center_position)		
 		if unit_pos.x < 0 or unit_pos.x > 15 or unit_pos.y < 0 or unit_pos.y > 15:
 			self.get_child(0).play("death")
 			await get_tree().create_timer(0.5).timeout	
 			self.position.y -= 500		
-			self.add_to_group("dead")
-			self.remove_from_group("zombies")								
+			self.add_to_group("dead") 
+			self.remove_from_group("zombies") 
 			break
 
 	# Check for unit collisions	
-	for i in all_units.size():
-		if all_units[i] != self and self.position == all_units[i].position:
+	for i in get_node("../TileMap").cpu_units.size():
+		if get_node("../TileMap").cpu_units[i] != self and self.position == get_node("../TileMap").cpu_units[i].position and self.unit_type == "Zombie" and !self.is_in_group("dead"):
 			self.get_child(0).play("death")
 			await get_tree().create_timer(0.5).timeout	
 			self.position.y -= 500		

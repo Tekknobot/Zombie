@@ -49,6 +49,8 @@ var all_landmines = []
 var path_interupted = false
 var landmines_total = 0
 
+var humans_dead = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
@@ -101,8 +103,7 @@ func _process(delta):
 	for h in 16:
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
-
-
+						
 func _input(event):
 	if event is InputEventKey:	
 		if event.pressed and event.keycode == KEY_ESCAPE:
@@ -136,7 +137,6 @@ func _input(event):
 					
 					#projectile and melee	
 					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
-						only_once = false
 						
 						if right_clicked_unit.unit_team == 1:
 							right_clicked_unit.attacked = true
@@ -207,11 +207,10 @@ func _input(event):
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 						
 						_on_zombie()	
-						only_once = true
+
 				
 					#landmines
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and landmines_range == true and only_once == true:
-						only_once = false
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false:
 						
 						#if right_clicked_unit.unit_team == 1:
 							#right_clicked_unit.attacked = true
@@ -340,14 +339,14 @@ func _input(event):
 									var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
 									user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
 									path_interupted = true
-									var explosion = preload("res://scenes/vfx/explosion.scn")
-									var explosion_instance = explosion.instantiate()
-									var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
-									explosion_instance.set_name("explosion")
-									get_parent().add_child(explosion_instance)
-									explosion_instance.position = explosion_position	
-									explosion_instance.position.y -= 16
-									explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
+									#var explosion = preload("res://scenes/vfx/explosion.scn")
+									#var explosion_instance = explosion.instantiate()
+									#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
+									#explosion_instance.set_name("explosion")
+									#get_parent().add_child(explosion_instance)
+									#explosion_instance.position = explosion_position	
+									#explosion_instance.position.y -= 16
+									#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
 									var tween = create_tween()
 									tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
 									tween.connect("finished", on_tween_finished)
@@ -410,7 +409,7 @@ func _input(event):
 									
 					_on_zombie()						
 					
-				only_once = true
+
 						
 				#Show movement range	
 				for i in all_units.size():				
@@ -559,7 +558,7 @@ func _input(event):
 					pass
 				else:
 					#print("Left button was released")
-					only_once = true
+					pass
 				
 func dog_attack_ai():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -1241,8 +1240,8 @@ func _on_zombie():
 	await zombie_attack_ai()
 	
 func on_tween_finished():
-	user_units[selected_unit_num].position.y -= 500		
-	user_units[selected_unit_num].add_to_group("dead")
-	user_units[selected_unit_num].remove_from_group("zombies")	
-	user_units[selected_unit_num].get_child(0).play("death")		
+	#user_units[selected_unit_num].position.y -= 500		
+	#user_units[selected_unit_num].add_to_group("dead")
+	#user_units[selected_unit_num].remove_from_group("zombies")	
+	#user_units[selected_unit_num].get_child(0).play("death")			
 	_on_zombie()
