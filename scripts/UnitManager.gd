@@ -170,12 +170,10 @@ func _process(delta):
 func fuel_dog():
 	humans = get_tree().get_nodes_in_group("humans")
 	for j in humans.size():
-		print(humans[j].tile_pos.x)
-		if get_node("../SpawnManager").spawn_complete == true:
+		if get_node("../SpawnManager").spawn_complete == true and self.unit_type == "Dog":
 			var surrounding_cells = get_node("../TileMap").get_surrounding_cells(self.tile_pos)	
 			for i in surrounding_cells.size():
-				print(humans[j].tile_pos.x, surrounding_cells[i].x)
-				if humans[j].tile_pos.x == surrounding_cells[i].x+1:
+				if humans[j].tile_pos == surrounding_cells[i]:
 					self.modulate = Color8(255, 255, 255)
 					self.kill_count = 0
 					self.moved == false
