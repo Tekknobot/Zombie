@@ -685,7 +685,14 @@ func zombie_attack_ai():
 	humans = get_tree().get_nodes_in_group("humans")
 	var closest_zombie_to_human = humans[rng.randi_range(0,humans.size()-1)].get_closest_attack_zombies()
 	#var active_zombie = rng.randi_range(0,zombies.size()-1)
-	var target_human = rng.randi_range(0,humans.size()-1)			
+	var target_human = rng.randi_range(0,humans.size()-1)
+	
+	if !closest_zombie_to_human:
+		return
+	
+	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("dead"):
+		zombie_attack_ai()
+				
 	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
 		var closest_atack = closest_zombie_to_human.get_closest_attack_humans()										
 		var zombie_target_pos = local_to_map(closest_atack.position)
@@ -751,7 +758,6 @@ func zombie_attack_ai():
 					closest_atack.get_child(0).play("death")	
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("dead")
-					closest_atack.remove_from_group("humans")
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
 					break	
