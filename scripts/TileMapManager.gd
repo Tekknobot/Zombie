@@ -104,7 +104,11 @@ func _process(delta):
 
 
 func _input(event):
-	if event is InputEventMouseButton:			
+	if event is InputEventKey:	
+		if event.pressed and event.keycode == KEY_ESCAPE:
+			get_tree().quit()
+				
+	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true:	
 			if event.pressed:
 				var mouse_pos = get_global_mouse_position()
