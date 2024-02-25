@@ -340,23 +340,20 @@ func _input(event):
 									var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
 									user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
 									path_interupted = true
-									#var explosion = preload("res://scenes/vfx/explosion.scn")
-									#var explosion_instance = explosion.instantiate()
-									#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
-									#explosion_instance.set_name("explosion")
-									#get_parent().add_child(explosion_instance)
-									#explosion_instance.position = explosion_position	
-									#explosion_instance.position.y -= 16
-									#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
+									var explosion = preload("res://scenes/vfx/explosion.scn")
+									var explosion_instance = explosion.instantiate()
+									var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
+									explosion_instance.set_name("explosion")
+									get_parent().add_child(explosion_instance)
+									explosion_instance.position = explosion_position	
+									explosion_instance.position.y -= 16
+									explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
 									var tween = create_tween()
 									tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
+									tween.connect("finished", on_tween_finished)
 									get_node("../TileMap").all_landmines[i].position.y -= 500		
-									#user_units[selected_unit_num].position.y -= 500		
-									#user_units[selected_unit_num].add_to_group("dead")
-									#user_units[selected_unit_num].remove_from_group("zombies")	
-									#user_units[selected_unit_num].get_child(0).play("death")	
-									landmines_total -= 1		
-									_on_zombie()
+									landmines_total -= 1	
+									
 							else:
 								path_interupted = false
 								
@@ -1243,3 +1240,9 @@ func _on_zombie():
 			
 	await zombie_attack_ai()
 	
+func on_tween_finished():
+	user_units[selected_unit_num].position.y -= 500		
+	user_units[selected_unit_num].add_to_group("dead")
+	user_units[selected_unit_num].remove_from_group("zombies")	
+	user_units[selected_unit_num].get_child(0).play("death")		
+	_on_zombie()

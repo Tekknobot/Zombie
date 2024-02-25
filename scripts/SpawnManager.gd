@@ -118,7 +118,7 @@ func spawn():
 		var tween: Tween = create_tween()
 		tween.tween_property(zomb, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0).timeout
 									
 	await get_tree().create_timer(1).timeout	
 	
