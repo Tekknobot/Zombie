@@ -35,6 +35,8 @@ var landmines = []
 
 var only_once = true
 
+var kill_count = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -92,14 +94,21 @@ func _process(delta):
 	else:
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
+
 	if self.moved == true and self.attacked == true:
 		self.modulate = Color8(110, 110, 110)
 	else:
 		self.modulate = Color8(255, 255, 255)
 
+	if self.kill_count >= 3:
+		self.modulate = Color8(110, 110, 110)
+	else:
+		self.modulate = Color8(255, 255, 255)
 
+		
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
+	
 	
 	# Check if off map
 	for i in get_node("../TileMap").cpu_units.size():
@@ -158,6 +167,19 @@ func _process(delta):
 				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 			
 			break
 
+func fuel_dog():
+	humans = get_tree().get_nodes_in_group("humans")
+	for j in humans.size():
+		print(humans[j].tile_pos.x)
+		if get_node("../SpawnManager").spawn_complete == true:
+			var surrounding_cells = get_node("../TileMap").get_surrounding_cells(self.tile_pos)	
+			for i in surrounding_cells.size():
+				print(humans[j].tile_pos.x, surrounding_cells[i].x)
+				if humans[j].tile_pos.x == surrounding_cells[i].x+1:
+					self.modulate = Color8(255, 255, 255)
+					self.kill_count = 0
+					self.moved == false
+					self.attacked == false
 
 func landmine_collisions():			
 	var unit_center_pos = get_node("../TileMap").local_to_map(self.position)		

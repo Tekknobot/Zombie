@@ -404,6 +404,7 @@ func _input(event):
 									cpu_units[j].remove_from_group("zombies")
 						
 									user_units[selected_unit_num].moved = true
+									user_units[selected_unit_num].kill_count += 1
 									_on_zombie()
 									return
 									
@@ -431,7 +432,7 @@ func _input(event):
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)
 																								
 				for i in all_units.size():					
-					if all_units[i].unit_type == "Dog" and all_units[i].moved == false:		
+					if all_units[i].unit_type == "Dog" and all_units[i].moved == false and all_units[i].kill_count < 3:		
 						#Place hover tiles		
 						for j in dogs.size():
 							var unit_pos = local_to_map(dogs[j].position)
@@ -449,6 +450,8 @@ func _input(event):
 								for m in grid_height:
 									for n in grid_width:
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)
+					elif all_units[i].unit_type == "Dog" and all_units[i].kill_count >= 3:
+						all_units[i].fuel_dog()
 																			
 				for i in user_units.size():
 					if user_units[selected_unit_num].moved == false:
