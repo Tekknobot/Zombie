@@ -110,7 +110,7 @@ func _input(event):
 			get_tree().quit()
 				
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true:	
+		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
@@ -311,6 +311,7 @@ func _input(event):
 						
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
+					moving = true
 					#Remove hover tiles										
 					for j in grid_height:
 						for k in grid_width:
@@ -1245,8 +1246,10 @@ func _on_zombie():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-			
+	
+	moving = false		
 	await zombie_attack_ai()
+	
 	
 func on_tween_finished():
 	#user_units[selected_unit_num].position.y -= 500		
