@@ -53,6 +53,7 @@ var landmines_total = 0
 var structure_interupterd = false
 
 var humans_dead = 0
+var dead_zombies = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -110,8 +111,7 @@ func _process(delta):
 	if get_node("../SpawnManager").spawn_complete == true and moving == true:
 		get_node("../Arrow").hide()
 		get_node("../Arrow2").hide()
-		hovertile.hide()
-		
+		hovertile.hide()					
 						
 func _input(event):
 	if event is InputEventKey:	
@@ -701,10 +701,6 @@ func humans_attack_ai():
 			
 func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	zombies = get_tree().get_nodes_in_group("zombies")
-	#humans = get_tree().get_nodes_in_group("humans")
-	#var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
-	#var active_zombie = rng.randi_range(0,zombies.size()-1)
-	#var target_human = rng.randi_range(0,humans.size()-1)
 	
 	if !closest_zombie_to_human:
 		return

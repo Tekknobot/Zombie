@@ -470,7 +470,8 @@ func check_duplicates(a):
 				a[i].position = i_global
 				var tile_pos_i = Vector2i(i_pos.x, i_pos.y)
 				#a[i].get_child(0).modulate = Color8(255, 255, 255)	
-				a[j].get_child(0).modulate.a = 0
+				a[i].get_child(0).modulate.a = 0
+				a[i].position.y -= 500
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
 				Map.astar_grid.set_point_solid(i_pos, false)
 								
