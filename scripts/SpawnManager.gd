@@ -29,6 +29,8 @@ func spawn():
 	spawn_button.hide()
 	#zombie_button.show()
 	
+	await get_tree().create_timer(1).timeout
+	
 	# Find open tiles
 	open_tiles.clear()	
 	for i in 16:
@@ -126,6 +128,8 @@ func spawn():
 									
 	await get_tree().create_timer(1).timeout	
 	
+	spawn_complete = true
+	
 func get_random_numbers(from, to):
 	var arr = []
 	for i in range(from,to):
@@ -135,5 +139,4 @@ func get_random_numbers(from, to):
 
 func _on_spawn_button_pressed():
 	await spawn()
-	spawn_complete = true
 	#get_node("../TileMap").zombie_attack_ai()
