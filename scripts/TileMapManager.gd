@@ -776,6 +776,9 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					closest_zombie_to_human.get_child(0).play("default")	
 					break	
 
+		else:
+			zombie_attack_ai(target_human, closest_zombie_to_human)
+
 	get_node("../Arrow").show()
 	get_node("../Arrow").position = closest_zombie_to_human.position
 	var arrow_pos = local_to_map(get_node("../Arrow").position)
@@ -1277,6 +1280,8 @@ func _on_zombie():
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
+	if closest_zombie_to_human == null:
+		return
 	if !closest_zombie_to_human.is_in_group("dead"):
 		get_node("../Arrow").show()
 		get_node("../Arrow").position = closest_zombie_to_human.position

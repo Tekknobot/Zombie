@@ -207,17 +207,19 @@ func landmine_collisions():
 
 func get_closest_attack_zombies():
 	var all_players = get_tree().get_nodes_in_group("zombies")
-	var closest_player = null
- 
-	if (all_players.size() > 0):
-		closest_player = all_players[0]
-		for player in all_players:
-			var distance_to_this_player = global_position.distance_squared_to(player.global_position)	
-			var distance_to_closest_player = global_position.distance_squared_to(closest_player.global_position)
-			if (distance_to_this_player < distance_to_closest_player):
-				closest_player = player
-				
-	return closest_player
+	for i in all_players.size():
+		if !all_players[i].is_in_group("dead"):
+			var closest_player = null
+		 
+			if (all_players.size() > 0):
+				closest_player = all_players[0]
+				for player in all_players:
+					var distance_to_this_player = global_position.distance_squared_to(player.global_position)	
+					var distance_to_closest_player = global_position.distance_squared_to(closest_player.global_position)
+					if (distance_to_this_player < distance_to_closest_player):
+						closest_player = player
+						
+			return closest_player
 
 func get_closest_attack_dog():
 	var all_players = get_tree().get_nodes_in_group("dogs")
