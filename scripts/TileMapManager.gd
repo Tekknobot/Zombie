@@ -50,6 +50,8 @@ var all_landmines = []
 var path_interupted = false
 var landmines_total = 0
 
+var structure_interupterd = false
+
 var humans_dead = 0
 
 # Called when the node enters the scene tree for the first time.
@@ -714,7 +716,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		
 		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
-		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1: 
+		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1 and structure_interupterd == false: 
 			moving = true
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
@@ -740,7 +742,20 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 						# Remove hover cells
 						for j in patharray.size():
 							set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)							
-						return				
+						return		
+						
+				for i in node2D.structures.size():
+					var structure_pos = local_to_map(node2D.structures[i].position)	
+					var path_pos = local_to_map(tile_center_position)
+					if path_pos	== structure_pos:
+						structure_interupterd = true
+						closest_zombie_to_human.structure_collisions()	
+						# Remove hover cells
+						for j in patharray.size():
+							set_cell(1, patharray[j], -1, Vector2i(0, 0), 0)							
+						return		
+							
+							
 				if h == closest_zombie_to_human.unit_movement:
 					break
 
@@ -789,7 +804,8 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
 	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
-	moving = false			
+	moving = false		
+		
 
 func _on_zombie_button_pressed():
 	zombie_button.hide()

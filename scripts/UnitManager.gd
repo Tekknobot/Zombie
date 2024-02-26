@@ -204,6 +204,33 @@ func landmine_collisions():
 			get_node("../TileMap").landmines_total -= 1	
 			get_node("../TileMap").moving = false
 
+func structure_collisions():		
+	#Structure collisions			
+	for i in structures.size():
+		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
+		var structure_pos = get_node("../TileMap").local_to_map(get_node("/root/Scene2D").structures[i].position)
+		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true:
+			self.get_child(0).play("death")
+				
+			await get_tree().create_timer(0.5).timeout	
+			
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")
+
+			#await get_tree().create_timer(0).timeout
+			
+			var explosion = preload("res://scenes/vfx/explosion.scn")
+			var explosion_instance = explosion.instantiate()
+			var explosion_position = get_node("../TileMap").map_to_local(structure_pos) + Vector2(0,0) / 2
+			explosion_instance.set_name("explosion")
+			get_parent().add_child(explosion_instance)
+			explosion_instance.position = explosion_position	
+			explosion_instance.position.y -= 16
+			explosion_instance.z_index = (structure_pos.x + structure_pos.y) + 1				
+			get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
+			get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
+			get_node("../TileMap").moving = false	
 
 func get_closest_attack_zombies():
 	var all_players = get_tree().get_nodes_in_group("zombies")
