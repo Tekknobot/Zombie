@@ -53,6 +53,7 @@ var landmines_total = 0
 var structure_interupterd = false
 
 var dead_zombies = []
+var dead_humans = []
 var get_append_only_once = true
 
 # Called when the node enters the scene tree for the first time.
@@ -326,6 +327,9 @@ func _input(event):
 						
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
+					if dead_humans.size() == 2:
+						return
+						
 					check_zombies_dead()
 					moving = true
 					#Remove hover tiles										
@@ -807,7 +811,8 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
 	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
-	moving = false		
+	moving = false	
+	check_humans_dead()	
 		
 
 func _on_zombie_button_pressed():
@@ -1326,4 +1331,14 @@ func check_zombies_dead():
 	if dead_zombies.size() == cpu_units.size():
 		get_node("../Arrow").modulate.a = 0
 		get_node("../Arrow2").modulate.a = 0
-		print("Map cleared!")	
+		print("Map Cleared!")	
+		get_tree().reload_current_scene()
+
+func check_humans_dead():
+	dead_humans = get_tree().get_nodes_in_group("humans dead")
+			
+	if dead_humans.size() == 2:
+		get_node("../Arrow").modulate.a = 0
+		get_node("../Arrow2").modulate.a = 0
+		print("Zombies Win!")	
+		get_tree().reload_current_scene()

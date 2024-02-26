@@ -105,10 +105,8 @@ func _process(delta):
 	else:
 		self.modulate = Color8(255, 255, 255)
 
-		
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
-	
 	
 	# Check if off map
 	for i in get_node("../TileMap").cpu_units.size():
@@ -121,7 +119,6 @@ func _process(delta):
 			self.add_to_group("dead") 
 			self.remove_from_group("zombies") 
 			get_node("../TileMap").moving = false
-			get_node("../TileMap").check_zombies_dead()
 			break
 
 	# Check for unit collisions	
@@ -139,11 +136,12 @@ func _process(delta):
 			get_node("../TileMap").cpu_units[i].add_to_group("dead")
 			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")	
 			get_node("../TileMap").moving = false	
-			get_node("../TileMap").check_zombies_dead()	
 			break
 
 	#Structure collisions			
 	for i in structures.size():
+		if self.unit_type == "Human":
+			return
 		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
 		var structure_pos = get_node("../TileMap").local_to_map(get_node("/root/Scene2D").structures[i].position)
 		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true:
@@ -170,7 +168,6 @@ func _process(delta):
 				get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
 				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
 				get_node("../TileMap").moving = false	
-				get_node("../TileMap").check_zombies_dead()
 			break
 
 func landmine_collisions():			
@@ -194,7 +191,6 @@ func landmine_collisions():
 			self.get_child(0).play("death")	
 			get_node("../TileMap").landmines_total -= 1	
 			get_node("../TileMap").moving = false
-			get_node("../TileMap").check_zombies_dead()
 
 func structure_collisions():		
 	#Structure collisions			
@@ -223,7 +219,6 @@ func structure_collisions():
 			get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
 			get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
 			get_node("../TileMap").moving = false	
-			get_node("../TileMap").check_zombies_dead()
 
 func fuel_dog():
 	humans = get_tree().get_nodes_in_group("humans")
