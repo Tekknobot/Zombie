@@ -178,7 +178,7 @@ func _input(event):
 						#get_node("../Camera2D").shake(0.5, 30, 3)
 						
 						
-						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(0,0), Vector2(0,0), Vector2(all_units[h].position.x,all_units[h].position.y-16))
+						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
@@ -331,7 +331,10 @@ func _input(event):
 											
 					target_pos = tile_pos 
 					var patharray = astar_grid.get_point_path(selected_pos, target_pos)
-
+					
+					if patharray.size() <= 0:
+						return
+					
 					# Find path and set hover cells
 					for h in patharray.size():
 						set_cell(1, patharray[h], 10, Vector2i(0, 0), 0)	
@@ -1168,7 +1171,7 @@ func show_dog_movement_range():
 					
 	attacks_container.hide()				
 
-func SetLinePoints(line: Line2D, a: Vector2, postA: Vector2, preB: Vector2, b: Vector2):
+func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
 	var _a = get_node("../TileMap").local_to_map(a)
 	var _b = get_node("../TileMap").local_to_map(b)		
@@ -1313,11 +1316,6 @@ func _on_zombie():
 		return		
 		
 	await zombie_attack_ai(target_human, closest_zombie_to_human)
-	
-	
-func on_tween_finished():
-	#user_units[selected_unit_num].position.y -= 500		
-	#user_units[selected_unit_num].add_to_group("dead")
-	#user_units[selected_unit_num].remove_from_group("zombies")	
-	#user_units[selected_unit_num].get_child(0).play("death")			
+		
+func on_tween_finished():			
 	_on_zombie()
