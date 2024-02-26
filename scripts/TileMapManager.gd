@@ -108,8 +108,8 @@ func _process(delta):
 	if get_node("../SpawnManager").spawn_complete == true and moving == true:
 		get_node("../Arrow").hide()
 		get_node("../Arrow2").hide()
-	elif get_node("../SpawnManager").spawn_complete == true and moving == false:
-		pass
+		hovertile.hide()
+		
 						
 func _input(event):
 	if event is InputEventKey:	
@@ -119,6 +119,8 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
+				hovertile.show()
+				
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
 				var tile_pos = local_to_map(mouse_pos)	
@@ -418,7 +420,7 @@ func _input(event):
 									return
 									
 					_on_zombie()						
-					
+					moving = false
 
 						
 				#Show movement range	
@@ -706,7 +708,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		_on_zombie()
 				
 	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
-		moving = true
 		var closest_atack = humans[target_human]									
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
@@ -774,8 +775,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					closest_atack.add_to_group("dead")
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
-					break	
-
+					break
 		else:
 			zombie_attack_ai(target_human, closest_zombie_to_human)
 
@@ -1282,19 +1282,18 @@ func _on_zombie():
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
 	if closest_zombie_to_human == null:
 		return
-	if !closest_zombie_to_human.is_in_group("dead"):
-		get_node("../Arrow").show()
-		get_node("../Arrow").position = closest_zombie_to_human.position
-		var arrow_pos = local_to_map(get_node("../Arrow").position)
-		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
-	else:
-		return	
-	if !humans[target_human].is_in_group("dead"):
+	if !humans[target_human].is_in_group("dead") and !closest_zombie_to_human.is_in_group("dead"):
 		get_node("../Arrow2").show()
 		get_node("../Arrow2").position = humans[target_human].position
 		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
 		get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
-	else:
+
+		get_node("../Arrow").show()
+		get_node("../Arrow").position = closest_zombie_to_human.position
+		var arrow_pos = local_to_map(get_node("../Arrow").position)
+		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
+	else:		
+		_on_zombie()
 		return		
 		
 	await zombie_attack_ai(target_human, closest_zombie_to_human)
