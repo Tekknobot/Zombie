@@ -120,6 +120,7 @@ func _process(delta):
 			self.position.y -= 500		
 			self.add_to_group("dead") 
 			self.remove_from_group("zombies") 
+			get_node("../TileMap").moving = false
 			break
 
 	# Check for unit collisions	
@@ -135,7 +136,8 @@ func _process(delta):
 			await get_tree().create_timer(0.5).timeout	
 			get_node("../TileMap").cpu_units[i].position.y -= 500		
 			get_node("../TileMap").cpu_units[i].add_to_group("dead")
-			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")			
+			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")	
+			get_node("../TileMap").moving = false		
 			break
 
 	#Structure collisions			
@@ -164,7 +166,8 @@ func _process(delta):
 				explosion_instance.position.y -= 16
 				explosion_instance.z_index = (structure_pos.x + structure_pos.y) + 1				
 				get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
-				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 			
+				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
+				get_node("../TileMap").moving = false	
 			break
 
 func fuel_dog():
@@ -199,6 +202,7 @@ func landmine_collisions():
 			self.remove_from_group("zombies")	
 			self.get_child(0).play("death")	
 			get_node("../TileMap").landmines_total -= 1	
+			get_node("../TileMap").moving = false
 
 
 func get_closest_attack_zombies():

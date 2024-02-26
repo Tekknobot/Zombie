@@ -105,9 +105,11 @@ func _process(delta):
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
 	
-	#if get_node("../SpawnManager").spawn_complete == true and only_once_zombie == true:
-		#only_once_zombie = false
-		#_on_zombie()
+	if get_node("../SpawnManager").spawn_complete == true and moving == true:
+		get_node("../Arrow").hide()
+		get_node("../Arrow2").hide()
+	elif get_node("../SpawnManager").spawn_complete == true and moving == false:
+		pass
 						
 func _input(event):
 	if event is InputEventKey:	
@@ -704,6 +706,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		_on_zombie()
 				
 	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
+		moving = true
 		var closest_atack = humans[target_human]									
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
@@ -711,6 +714,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1: 
+			moving = true
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
@@ -771,12 +775,19 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
 					break	
-	
+
 	get_node("../Arrow").show()
 	get_node("../Arrow").position = closest_zombie_to_human.position
 	var arrow_pos = local_to_map(get_node("../Arrow").position)
 	get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3		
-			
+
+	get_node("../Arrow2").show()
+	get_node("../Arrow2").position = humans[target_human].position
+	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
+	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
+	
+	moving = false			
+
 func _on_zombie_button_pressed():
 	zombie_button.hide()
 	
@@ -1271,13 +1282,16 @@ func _on_zombie():
 		get_node("../Arrow").position = closest_zombie_to_human.position
 		var arrow_pos = local_to_map(get_node("../Arrow").position)
 		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
-
+	else:
+		return	
 	if !humans[target_human].is_in_group("dead"):
 		get_node("../Arrow2").show()
 		get_node("../Arrow2").position = humans[target_human].position
-		var arrow_pos = local_to_map(get_node("../Arrow2").position)
-		get_node("../Arrow2").z_index = (arrow_pos.x + arrow_pos.y) + 3	
-			
+		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
+		get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
+	else:
+		return		
+		
 	await zombie_attack_ai(target_human, closest_zombie_to_human)
 	
 	
