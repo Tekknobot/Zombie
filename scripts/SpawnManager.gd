@@ -96,6 +96,8 @@ func spawn():
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
 		await get_tree().create_timer(0.5).timeout
 
+	await get_tree().create_timer(1).timeout
+	
 	# Find open tiles again
 	open_tiles.clear()	
 	for i in 16:
@@ -105,8 +107,6 @@ func spawn():
 	
 	random.clear()
 	random = get_random_numbers(0, open_tiles.size())
-
-	await get_tree().create_timer(1).timeout
 
 	# Drop zombies at start	
 	for i in 16:	
