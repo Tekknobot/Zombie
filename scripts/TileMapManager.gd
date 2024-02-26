@@ -53,6 +53,7 @@ var landmines_total = 0
 var structure_interupterd = false
 
 var dead_zombies = []
+var get_append_only_once = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -137,8 +138,11 @@ func _input(event):
 				all_units.append_array(zombies)
 				all_units.append_array(dogs)			
 				user_units.append_array(dogs)			
-				user_units.append_array(humans)			
-				cpu_units.append_array(zombies)
+				user_units.append_array(humans)	
+				
+				if get_append_only_once:
+					get_append_only_once = false
+					cpu_units.append_array(zombies)
 					
 				# Ranged Attack
 				for h in all_units.size():					
@@ -322,6 +326,7 @@ func _input(event):
 						
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
+					check_zombies_dead()
 					moving = true
 					#Remove hover tiles										
 					for j in grid_height:
@@ -419,8 +424,7 @@ func _input(event):
 									cpu_units[j].remove_from_group("zombies")
 						
 									user_units[selected_unit_num].moved = true
-									user_units[selected_unit_num].kill_count += 1
-									check_zombies_dead()
+									user_units[selected_unit_num].kill_count += 1									
 									_on_zombie()
 									return
 									
@@ -1319,8 +1323,7 @@ func on_tween_finished():
 func check_zombies_dead():
 	dead_zombies = get_tree().get_nodes_in_group("dead")
 			
-	if dead_zombies.size() >= cpu_units.size()-1:
-		get_node("../Arrow").hide()
-		get_node("../Arrow2").hide()
-			
-	print(dead_zombies.size())	
+	if dead_zombies.size() == cpu_units.size():
+		get_node("../Arrow").modulate.a = 0
+		get_node("../Arrow2").modulate.a = 0
+		print("Map cleared!")	
