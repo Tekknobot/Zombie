@@ -52,8 +52,7 @@ var landmines_total = 0
 
 var structure_interupterd = false
 
-var humans_dead = 0
-var dead_zombies = 0
+var dead_zombies = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -421,6 +420,7 @@ func _input(event):
 						
 									user_units[selected_unit_num].moved = true
 									user_units[selected_unit_num].kill_count += 1
+									check_zombies_dead()
 									_on_zombie()
 									return
 									
@@ -705,10 +705,10 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	if !closest_zombie_to_human:
 		return
 	
-	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("dead"):
+	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("humans dead"):
 		_on_zombie()
 				
-	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
+	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("humans dead"):
 		var closest_atack = humans[target_human]									
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
@@ -786,7 +786,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
 					await get_tree().create_timer(1).timeout
-					closest_atack.add_to_group("dead")
+					closest_atack.add_to_group("humans dead")
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
 					break
@@ -1275,7 +1275,7 @@ func show_humans_landmine_range():
 func _on_landmine_button_pressed():
 	show_humans_landmine_range()
 
-func _on_zombie():
+func _on_zombie():	
 	zombie_button.hide()
 	
 	for i in user_units.size():
@@ -1297,7 +1297,7 @@ func _on_zombie():
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
 	if closest_zombie_to_human == null:
 		return
-	if !humans[target_human].is_in_group("dead") and !closest_zombie_to_human.is_in_group("dead"):
+	if !humans[target_human].is_in_group("humans dead") and !closest_zombie_to_human.is_in_group("dead"):
 		get_node("../Arrow2").show()
 		get_node("../Arrow2").position = humans[target_human].position
 		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
@@ -1310,8 +1310,17 @@ func _on_zombie():
 	else:		
 		_on_zombie()
 		return		
-		
+	
 	await zombie_attack_ai(target_human, closest_zombie_to_human)
 		
 func on_tween_finished():			
 	_on_zombie()
+
+func check_zombies_dead():
+	dead_zombies = get_tree().get_nodes_in_group("dead")
+			
+	if dead_zombies.size() >= cpu_units.size()-1:
+		get_node("../Arrow").hide()
+		get_node("../Arrow2").hide()
+			
+	print(dead_zombies.size())	

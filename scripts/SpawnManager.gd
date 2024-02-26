@@ -50,9 +50,9 @@ func spawn():
 		tween.tween_property(dog_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
 		get_node("../TileMap").right_clicked_unit = dog_inst
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0).timeout
 
-	await get_tree().create_timer(0).timeout
+	await get_tree().create_timer(1).timeout
 	
 	# Find open tiles again
 	open_tiles.clear()	
@@ -74,9 +74,9 @@ func spawn():
 		var tween: Tween = create_tween()
 		tween.tween_property(soldier_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0).timeout
 
-	await get_tree().create_timer(0).timeout
+	await get_tree().create_timer(1).timeout
 	
 	# Find open tiles again
 	open_tiles.clear()	
@@ -98,9 +98,9 @@ func spawn():
 		var tween: Tween = create_tween()
 		tween.tween_property(rambo_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0).timeout
 
-	await get_tree().create_timer(0).timeout
+	await get_tree().create_timer(1).timeout
 	
 	# Find open tiles again
 	open_tiles.clear()	

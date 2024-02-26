@@ -121,7 +121,7 @@ func _process(delta):
 			self.add_to_group("dead") 
 			self.remove_from_group("zombies") 
 			get_node("../TileMap").moving = false
-			check_zombies_dead()
+			get_node("../TileMap").check_zombies_dead()
 			break
 
 	# Check for unit collisions	
@@ -139,7 +139,7 @@ func _process(delta):
 			get_node("../TileMap").cpu_units[i].add_to_group("dead")
 			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")	
 			get_node("../TileMap").moving = false	
-			check_zombies_dead()	
+			get_node("../TileMap").check_zombies_dead()	
 			break
 
 	#Structure collisions			
@@ -170,20 +170,8 @@ func _process(delta):
 				get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
 				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
 				get_node("../TileMap").moving = false	
-				check_zombies_dead()
+				get_node("../TileMap").check_zombies_dead()
 			break
-
-func fuel_dog():
-	humans = get_tree().get_nodes_in_group("humans")
-	for j in humans.size():
-		if get_node("../SpawnManager").spawn_complete == true and self.unit_type == "Dog":
-			var surrounding_cells = get_node("../TileMap").get_surrounding_cells(self.tile_pos)	
-			for i in surrounding_cells.size():
-				if humans[j].tile_pos == surrounding_cells[i]:
-					self.modulate = Color8(255, 255, 255)
-					self.kill_count = 0
-					self.moved == false
-					self.attacked == false
 
 func landmine_collisions():			
 	var unit_center_pos = get_node("../TileMap").local_to_map(self.position)		
@@ -206,7 +194,7 @@ func landmine_collisions():
 			self.get_child(0).play("death")	
 			get_node("../TileMap").landmines_total -= 1	
 			get_node("../TileMap").moving = false
-			check_zombies_dead()
+			get_node("../TileMap").check_zombies_dead()
 
 func structure_collisions():		
 	#Structure collisions			
@@ -235,7 +223,19 @@ func structure_collisions():
 			get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
 			get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
 			get_node("../TileMap").moving = false	
-			check_zombies_dead()
+			get_node("../TileMap").check_zombies_dead()
+
+func fuel_dog():
+	humans = get_tree().get_nodes_in_group("humans")
+	for j in humans.size():
+		if get_node("../SpawnManager").spawn_complete == true and self.unit_type == "Dog":
+			var surrounding_cells = get_node("../TileMap").get_surrounding_cells(self.tile_pos)	
+			for i in surrounding_cells.size():
+				if humans[j].tile_pos == surrounding_cells[i]:
+					self.modulate = Color8(255, 255, 255)
+					self.kill_count = 0
+					self.moved == false
+					self.attacked == false
 
 func get_closest_attack_zombies():
 	var all_players = get_tree().get_nodes_in_group("zombies")
@@ -282,10 +282,3 @@ func get_closest_attack_humans():
 	return closest_player
 
 
-func check_zombies_dead():
-	for i in get_node("../TileMap").cpu_units.size():
-		if get_node("../TileMap").cpu_units[i].is_in_group("dead"):
-			get_node("../TileMap").dead_zombies += 1
-		if get_node("../TileMap").dead_zombies >= get_node("../TileMap").cpu_units.size():
-			get_node("../Arrow").hide()
-			get_node("../Arrow2").hide()		
