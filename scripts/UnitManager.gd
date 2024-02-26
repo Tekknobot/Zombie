@@ -100,7 +100,7 @@ func _process(delta):
 	else:
 		self.modulate = Color8(255, 255, 255)
 
-	if self.kill_count >= 3:
+	if self.kill_count >= 3 and self.unit_type == "Dog":
 		self.modulate = Color8(110, 110, 110)
 	else:
 		self.modulate = Color8(255, 255, 255)
@@ -135,7 +135,7 @@ func _process(delta):
 			await get_tree().create_timer(0.5).timeout	
 			get_node("../TileMap").cpu_units[i].position.y -= 500		
 			get_node("../TileMap").cpu_units[i].add_to_group("dead")
-			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")				
+			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")			
 			break
 
 	#Structure collisions			

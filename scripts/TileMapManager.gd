@@ -41,6 +41,7 @@ var left_clicked_unit
 var left_clicked_unit_position
 
 var only_once = true
+var only_once_zombie = true
 var attack_range = false
 var landmines_range = false
 
@@ -103,6 +104,10 @@ func _process(delta):
 	for h in 16:
 		for i in 16:
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
+	
+	#if get_node("../SpawnManager").spawn_complete == true and only_once_zombie == true:
+		#only_once_zombie = false
+		#_on_zombie()
 						
 func _input(event):
 	if event is InputEventKey:	
@@ -205,6 +210,7 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y		
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+						
 						
 						_on_zombie()	
 
@@ -684,21 +690,21 @@ func humans_attack_ai():
 					closest_atack.remove_from_group("zombies")	
 					break	
 			
-func zombie_attack_ai():
+func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	zombies = get_tree().get_nodes_in_group("zombies")
-	humans = get_tree().get_nodes_in_group("humans")
-	var closest_zombie_to_human = humans[rng.randi_range(0,humans.size()-1)].get_closest_attack_zombies()
+	#humans = get_tree().get_nodes_in_group("humans")
+	#var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
 	#var active_zombie = rng.randi_range(0,zombies.size()-1)
-	var target_human = rng.randi_range(0,humans.size()-1)
+	#var target_human = rng.randi_range(0,humans.size()-1)
 	
 	if !closest_zombie_to_human:
 		return
 	
 	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("dead"):
-		zombie_attack_ai()
+		_on_zombie()
 				
 	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("dead"):
-		var closest_atack = closest_zombie_to_human.get_closest_attack_humans()										
+		var closest_atack = humans[target_human]									
 		var zombie_target_pos = local_to_map(closest_atack.position)
 		var zombie_surrounding_cells = get_surrounding_cells(zombie_target_pos)
 		
@@ -765,6 +771,11 @@ func zombie_attack_ai():
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
 					break	
+	
+	get_node("../Arrow").show()
+	get_node("../Arrow").position = closest_zombie_to_human.position
+	var arrow_pos = local_to_map(get_node("../Arrow").position)
+	get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3		
 			
 func _on_zombie_button_pressed():
 	zombie_button.hide()
@@ -780,8 +791,9 @@ func _on_zombie_button_pressed():
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
 			
 	for i in zombies.size():
-		await zombie_attack_ai()
-	
+		#await zombie_attack_ai(rng.randi_range(0,humans.size()-1))
+		pass
+		
 	zombie_button.show()
 			
 func _on_dog_button_pressed():
@@ -1248,7 +1260,25 @@ func _on_zombie():
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
 	
 	moving = false		
-	await zombie_attack_ai()
+	
+	get_node("../Arrow").show()
+	humans = get_tree().get_nodes_in_group("humans")
+	var target_human = rng.randi_range(0,humans.size()-1)
+	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
+	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
+	if !closest_zombie_to_human.is_in_group("dead"):
+		get_node("../Arrow").show()
+		get_node("../Arrow").position = closest_zombie_to_human.position
+		var arrow_pos = local_to_map(get_node("../Arrow").position)
+		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
+
+	if !humans[target_human].is_in_group("dead"):
+		get_node("../Arrow2").show()
+		get_node("../Arrow2").position = humans[target_human].position
+		var arrow_pos = local_to_map(get_node("../Arrow2").position)
+		get_node("../Arrow2").z_index = (arrow_pos.x + arrow_pos.y) + 3	
+			
+	await zombie_attack_ai(target_human, closest_zombie_to_human)
 	
 	
 func on_tween_finished():
