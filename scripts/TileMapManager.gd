@@ -47,6 +47,7 @@ var only_once = true
 var only_once_zombie = true
 var attack_range = false
 var landmines_range = false
+var dog_range = false
 
 var landmines = []
 var all_landmines = []
@@ -59,6 +60,8 @@ var dead_zombies = []
 var dead_humans = []
 var get_append_only_once = true
 var map_cleared = false
+
+var landmine_temp
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -116,7 +119,7 @@ func _process(delta):
 	if get_node("../SpawnManager").spawn_complete == true and moving == true:
 		get_node("../Arrow").hide()
 		get_node("../Arrow2").hide()
-		hovertile.hide()					
+		hovertile.hide()				
 						
 func _input(event):
 	if event is InputEventKey:	
@@ -154,8 +157,8 @@ func _input(event):
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 					left_clicked_unit = all_units[h]
 					
-					#projectile and melee	
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false:
+					#projectile	
+					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false and right_clicked_unit.unit_name == "Butch":
 						
 						if right_clicked_unit.unit_team == 1:
 							right_clicked_unit.attacked = true
@@ -225,17 +228,70 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 						
-						
+						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
+					#landmine run
+					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog":
+						#Move unit
+						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
+							if dead_humans.size() == 2:					
+								return
+									
+							check_zombies_dead()
+							
+							if map_cleared == true:
+								return
+							
+							moving = true
+							#Remove hover tiles										
+							for j in grid_height:
+								for k in grid_width:
+									set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+													
+							target_pos = tile_pos 
+							var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+							
+							if patharray.size() <= 0:
+								moving = false
+								return
+													
+							# Move unit		
+							for k in patharray.size():	
+								set_cell(1, patharray[k], 10, Vector2i(0, 0), 0)		
+								user_units[selected_unit_num].get_child(0).play("move")						
+								var tile_center_position = map_to_local(patharray[k]) + Vector2(0,0) / 2
+								var unit_pos = local_to_map(user_units[selected_unit_num].position)
+								user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y
+													
+								var tween = create_tween()
+								tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)
+								
+								var landmine = preload("res://scenes/mines/landmine.scn")
+								var landmine_instance = landmine.instantiate()
+								var landmine_position = get_node("../TileMap").map_to_local(patharray[k]) + Vector2(0,0) / 2
+								landmine_instance.set_name("landmine")
+								get_parent().add_child(landmine_instance)
+								landmine_instance.position = landmine_position	
+								landmine_instance.z_index = (unit_pos.x + unit_pos.y) - 1
+								landmine_instance.add_to_group("mines")
+								landmines = get_tree().get_nodes_in_group("mines")
+								all_landmines.append_array(landmines)			
+								
+								landmine_temp = landmine_instance								
+								await get_tree().create_timer(0.25).timeout	
+								
+							if landmine_temp:
+								landmine_temp.position.y -= 500
+								
+							user_units[selected_unit_num].kill_count = 2
+							user_units[selected_unit_num].get_child(0).play("default")
+								
+							_on_zombie()
+							moving = false					
 				
-					#landmines
+					#landmine drop
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false:
-						
-						#if right_clicked_unit.unit_team == 1:
-							#right_clicked_unit.attacked = true
-							#right_clicked_unit.moved = true
-						
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
@@ -383,13 +439,13 @@ func _input(event):
 									var tween = create_tween()
 									tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
 									tween.connect("finished", on_tween_finished)
-									get_node("../TileMap").all_landmines[i].position.y -= 500		
-									landmines_total -= 1	
-									
-							else:
-								path_interupted = false
+									get_node("../TileMap").all_landmines[i].position.y -= 500
+									user_units[selected_unit_num].get_child(0).play("default")		
+									landmines_total -= 1									
 								
 						if path_interupted == true:
+							moving = false
+							path_interupted = false
 							return
 							
 						if path_interupted == false:		
@@ -401,8 +457,6 @@ func _input(event):
 							user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
 							await get_tree().create_timer(0.25).timeout	
 										
-					
-						
 					# Remove hover cells
 					for h in patharray.size():
 						set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
@@ -526,7 +580,10 @@ func _input(event):
 				for i in user_units.size():
 					var unit_pos = local_to_map(user_units[i].position)
 
-					if unit_pos == tile_pos and user_units[i].unit_type == "Dog":
+					if unit_pos == tile_pos:
+						if user_units[i].unit_type == "Dog":
+							dog_range = true
+							
 						attack_range = true
 						landmines_range = false
 						right_clicked_unit = user_units[i]
