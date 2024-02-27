@@ -1340,7 +1340,7 @@ func check_zombies_dead():
 		get_node("../Arrow2").modulate.a = 0
 		print("Map Cleared!")
 		map_cleared = true	
-		get_tree().reload_current_scene()
+		#get_tree().reload_current_scene()
 
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
