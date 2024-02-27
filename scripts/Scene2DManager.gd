@@ -276,8 +276,7 @@ func spawn_structures():
 		towerblank_inst.z_index = tile_pos.x + tile_pos.y
 		towerblank_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
 		progresscount += 1
-		
-		
+			
 	if biome == 0:
 		environment_tiles()
 	if biome == 1:

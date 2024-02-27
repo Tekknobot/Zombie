@@ -16,6 +16,7 @@ var tile_pos
 @export var unit_team: int
 @export var unit_name: String
 @export var unit_movement: int
+@export var unit_attack_range: int
 @export var unit_type: String
 @export var unit_num: int
 @export var selected = false
