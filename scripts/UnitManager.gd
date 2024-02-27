@@ -151,7 +151,8 @@ func _process(delta):
 				
 				await get_tree().create_timer(0.5).timeout	
 				
-				self.position.y -= 500		
+				self.position.y -= 500	
+				self.get_child(0).modulate.a = 0	
 				self.add_to_group("dead")
 				self.remove_from_group("zombies")
 
@@ -203,6 +204,7 @@ func structure_collisions():
 			await get_tree().create_timer(0.5).timeout	
 			
 			self.position.y -= 500		
+			self.get_child(0).modulate.a = 0	
 			self.add_to_group("dead")
 			self.remove_from_group("zombies")
 

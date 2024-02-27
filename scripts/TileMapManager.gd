@@ -428,7 +428,9 @@ func _input(event):
 									tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)			
 									await get_tree().create_timer(1).timeout
 									cpu_units[j].get_child(0).play("death")
+									await get_tree().create_timer(1).timeout
 									user_units[selected_unit_num].get_child(0).play("default")	
+									cpu_units[j].position.y -= 500
 									cpu_units[j].add_to_group("dead")
 									cpu_units[j].remove_from_group("zombies")
 						
