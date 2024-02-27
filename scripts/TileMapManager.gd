@@ -583,6 +583,9 @@ func _input(event):
 					if unit_pos == tile_pos:
 						if user_units[i].unit_type == "Dog":
 							dog_range = true
+
+						if user_units[i].kill_count >= 2:
+							return
 							
 						attack_range = true
 						landmines_range = false
