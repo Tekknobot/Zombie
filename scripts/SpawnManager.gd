@@ -17,7 +17,6 @@ var rambo = preload("res://scenes/sprites/Rambo.scn")
 var spawn_complete = false
 var zombie_init_count = 16
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.

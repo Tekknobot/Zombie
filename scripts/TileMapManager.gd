@@ -16,6 +16,9 @@ var rng = RandomNumberGenerator.new()
 @onready var pre_b = $"../preB"
 @onready var sprite_2d = $"../Sprite2D"
 
+@onready var next_button = $"../Control/MenuContainer/NextButton"
+@onready var reset_button = $"../Control/MenuContainer/ResetButton"
+
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 
 var astar_grid = AStarGrid2D.new()
@@ -1340,7 +1343,8 @@ func check_zombies_dead():
 		get_node("../Arrow2").modulate.a = 0
 		print("Map Cleared!")
 		map_cleared = true	
-		#get_tree().reload_current_scene()
+		next_button.show()
+		reset_button.hide()
 
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
@@ -1350,3 +1354,6 @@ func check_humans_dead():
 		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
 		get_tree().reload_current_scene()
+
+func _on_next_button_pressed():
+	get_tree().reload_current_scene()
