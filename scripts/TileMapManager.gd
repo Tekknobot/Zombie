@@ -349,6 +349,7 @@ func _input(event):
 					var patharray = astar_grid.get_point_path(selected_pos, target_pos)
 					
 					if patharray.size() <= 0:
+						moving = false
 						return
 					
 					# Find path and set hover cells
