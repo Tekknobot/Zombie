@@ -61,6 +61,7 @@ var dead_humans = []
 var get_append_only_once = true
 var map_cleared = false
 
+var landmine_once = true
 var landmine_temp
 
 # Called when the node enters the scene tree for the first time.
@@ -151,7 +152,7 @@ func _input(event):
 				if get_append_only_once:
 					get_append_only_once = false
 					cpu_units.append_array(zombies)
-					
+											
 				# Ranged Attack
 				for h in all_units.size():					
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -187,8 +188,7 @@ func _input(event):
 						var right_clicked_pos = local_to_map(right_clicked_unit.position)
 						
 						#get_node("../Camera2D").shake(0.5, 30, 3)
-						
-						
+							
 						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
@@ -232,7 +232,7 @@ func _input(event):
 						_on_zombie()	
 
 					#landmine run
-					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog":
+					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake":
 						#Move unit
 						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
 							if dead_humans.size() == 2:					
@@ -258,7 +258,7 @@ func _input(event):
 													
 							# Move unit		
 							for k in patharray.size():	
-								set_cell(1, patharray[k], 10, Vector2i(0, 0), 0)		
+								set_cell(1, patharray[k], 48, Vector2i(0, 0), 0)		
 								user_units[selected_unit_num].get_child(0).play("move")						
 								var tile_center_position = map_to_local(patharray[k]) + Vector2(0,0) / 2
 								var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -289,9 +289,68 @@ func _input(event):
 								
 							_on_zombie()
 							moving = false					
-				
+
+					#landmine seek
+					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog":
+						#Move unit
+						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
+							if dead_humans.size() == 2:					
+								return
+									
+							check_zombies_dead()
+							
+							if map_cleared == true:
+								return
+							
+							moving = true
+							#Remove hover tiles										
+							for j in grid_height:
+								for k in grid_width:
+									set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+													
+							target_pos = tile_pos 
+							var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+							
+							if patharray.size() <= 0:
+								moving = false
+								return
+													
+							# Move unit		
+							for k in patharray.size():	
+								set_cell(1, patharray[k], 10, Vector2i(0, 0), 0)		
+								user_units[selected_unit_num].get_child(0).play("move")						
+								var tile_center_position = map_to_local(patharray[k]) + Vector2(0,0) / 2
+								var unit_pos = local_to_map(user_units[selected_unit_num].position)
+								user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y
+								
+								var landmine = preload("res://scenes/mines/landmine.scn")
+								var landmine_instance = landmine.instantiate()
+								var landmine_position = get_node("../TileMap").map_to_local(patharray[k]) + Vector2(0,0) / 2
+								landmine_instance.set_name("landmine")
+								get_parent().add_child(landmine_instance)
+								landmine_instance.position = landmine_position	
+								landmine_instance.z_index = (unit_pos.x + unit_pos.y) - 1
+								landmine_instance.add_to_group("mines")
+								landmines = get_tree().get_nodes_in_group("mines")
+								all_landmines.append_array(landmines)			
+
+								var tween = create_tween()
+								tween.tween_property(landmine_instance, "position", tile_center_position, 0.25)
+								
+								if landmine_once == true:
+									landmine_once = false
+									landmine_temp = landmine_instance
+																	
+								await get_tree().create_timer(0.25).timeout	
+								
+							landmine_temp.position.y -= 500
+							user_units[selected_unit_num].get_child(0).play("default")
+								
+							_on_zombie()
+							moving = false					
+					
 					#landmine drop
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false:
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Butch":
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
@@ -576,6 +635,12 @@ func _input(event):
 			var tile_pos = local_to_map(mouse_pos)		
 			var tile_data = get_cell_tile_data(0, tile_pos)
 
+			for i in user_units.size():
+				if user_units[i].tile_pos == tile_pos:
+					selected_unit_num = user_units[i].unit_num
+					selected_pos = user_units[i].tile_pos								
+					break
+
 			if tile_data is TileData:				
 				for i in user_units.size():
 					var unit_pos = local_to_map(user_units[i].position)
@@ -639,7 +704,8 @@ func _input(event):
 											set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
 											break
 					
-					elif unit_pos == tile_pos and user_units[i].unit_name == "Snake":
+					if unit_pos == tile_pos and user_units[i].unit_name == "Snake":
+						right_clicked_unit = user_units[i]						
 						show_rambo_attack_range()
 					
 			if tile_pos.x == 0:
@@ -768,6 +834,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
 	moving = false	
+	landmine_once = true
 	check_humans_dead()	
 			
 func show_zombie_movement_range():
