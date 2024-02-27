@@ -677,6 +677,8 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1 and structure_interupterd == false: 
 			moving = true
+			get_node("../Arrow").hide()
+			
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
@@ -765,27 +767,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	
 	moving = false	
 	check_humans_dead()	
-		
-
-func _on_zombie_button_pressed():
-	zombie_button.hide()
-	
-	for i in user_units.size():
-		modulate = Color8(255, 255, 255)
-		user_units[i].moved = false
-		user_units[i].attacked = false
-
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
 			
-	for i in zombies.size():
-		#await zombie_attack_ai(rng.randi_range(0,humans.size()-1))
-		pass
-		
-	zombie_button.show()
-				
 func show_zombie_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
