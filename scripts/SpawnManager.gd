@@ -39,14 +39,14 @@ func spawn():
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(0, open_tiles.size())
+	random = get_random_numbers(128, open_tiles.size())
 
 	# Drop dogs at start	
 	for i in 1:	
 		var dog_inst = dog.instantiate()
 		node2D.add_child(dog_inst)
 		dog_inst.add_to_group("dogs")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[144]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		dog_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(dog_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -64,14 +64,14 @@ func spawn():
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(0, open_tiles.size())
+	random = get_random_numbers(128, open_tiles.size())
 
 	# Drop soldier at start	
 	for i in 1:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("humans")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[144]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		soldier_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(soldier_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -88,14 +88,14 @@ func spawn():
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(0, open_tiles.size())
+	random = get_random_numbers(128, open_tiles.size())
 
 	# Drop Rambo at start	
 	for i in 1:	
 		var rambo_inst = rambo.instantiate()
 		node2D.add_child(rambo_inst)
 		rambo_inst.add_to_group("humans")			
-		var new_position = get_node("../TileMap").map_to_local(open_tiles[144]) + Vector2(0,0) / 2
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		rambo_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(rambo_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
@@ -112,7 +112,7 @@ func spawn():
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(0, open_tiles.size())
+	random = get_random_numbers(0, open_tiles.size()/2)
 
 	# Drop zombies at start	
 	for i in zombie_init_count:

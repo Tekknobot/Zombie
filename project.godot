@@ -22,7 +22,7 @@ boot_splash/minimum_display_time=1000
 
 [display]
 
-window/size/mode=4
+window/size/mode=2
 
 [rendering]
 
