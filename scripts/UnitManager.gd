@@ -20,6 +20,8 @@ var tile_pos
 @export var unit_num: int
 @export var selected = false
 
+@onready var root = $"."
+
 var attacked = false
 var zombies = []
 var humans = []
@@ -100,7 +102,7 @@ func _process(delta):
 	else:
 		self.modulate = Color8(255, 255, 255)
 
-	if self.kill_count >= 3 and self.unit_type == "Dog":
+	if self.kill_count >= 2 and self.unit_type == "Dog":
 		self.modulate = Color8(110, 110, 110)
 	else:
 		self.modulate = Color8(255, 255, 255)
@@ -143,7 +145,7 @@ func _process(delta):
 		if self.unit_type == "Human":
 			return
 		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
-		var structure_pos = get_node("../TileMap").local_to_map(get_node("/root/Scene2D").structures[i].position)
+		var structure_pos = get_node("../TileMap").local_to_map(root.structures[i].position)
 		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true:
 			if only_once == true:
 				only_once = false
