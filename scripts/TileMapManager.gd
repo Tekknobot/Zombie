@@ -55,6 +55,7 @@ var structure_interupterd = false
 var dead_zombies = []
 var dead_humans = []
 var get_append_only_once = true
+var map_cleared = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -327,10 +328,14 @@ func _input(event):
 						
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
-					if dead_humans.size() == 2:
+					if dead_humans.size() == 2:					
 						return
-						
+							
 					check_zombies_dead()
+					
+					if map_cleared == true:
+						return
+					
 					moving = true
 					#Remove hover tiles										
 					for j in grid_height:
@@ -1331,7 +1336,8 @@ func check_zombies_dead():
 	if dead_zombies.size() == cpu_units.size():
 		get_node("../Arrow").modulate.a = 0
 		get_node("../Arrow2").modulate.a = 0
-		print("Map Cleared!")	
+		print("Map Cleared!")
+		map_cleared = true	
 		get_tree().reload_current_scene()
 
 func check_humans_dead():

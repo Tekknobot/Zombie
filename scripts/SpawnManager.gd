@@ -15,6 +15,8 @@ var soldier = preload("res://scenes/sprites/Soldier.scn")
 var rambo = preload("res://scenes/sprites/Rambo.scn")
 
 var spawn_complete = false
+var zombie_init_count = 4
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -115,7 +117,7 @@ func spawn():
 	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop zombies at start	
-	for i in 16:	
+	for i in zombie_init_count:
 		var zomb = zombie.instantiate()
 		node2D.add_child(zomb)
 		zomb.add_to_group("zombies")			
