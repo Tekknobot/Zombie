@@ -317,7 +317,7 @@ func _input(event):
 													
 							# Move unit		
 							for k in patharray.size():	
-								set_cell(1, patharray[k], 10, Vector2i(0, 0), 0)		
+								set_cell(1, patharray[k], 48, Vector2i(0, 0), 0)		
 								user_units[selected_unit_num].get_child(0).play("move")						
 								var tile_center_position = map_to_local(patharray[k]) + Vector2(0,0) / 2
 								var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -329,7 +329,7 @@ func _input(event):
 								landmine_instance.set_name("landmine")
 								get_parent().add_child(landmine_instance)
 								landmine_instance.position = landmine_position	
-								landmine_instance.z_index = (unit_pos.x + unit_pos.y) - 1
+								landmine_instance.z_index = (unit_pos.x + unit_pos.y) - 2
 								landmine_instance.add_to_group("mines")
 								landmines = get_tree().get_nodes_in_group("mines")
 								all_landmines.append_array(landmines)			
