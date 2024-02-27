@@ -834,7 +834,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
 	moving = false	
-	landmine_once = true
 	check_humans_dead()	
 			
 func show_zombie_movement_range():
@@ -1425,6 +1424,7 @@ func _on_landmine_button_pressed():
 
 func _on_zombie():	
 	zombie_button.hide()
+	landmine_once = true
 	
 	for i in user_units.size():
 		modulate = Color8(255, 255, 255)
