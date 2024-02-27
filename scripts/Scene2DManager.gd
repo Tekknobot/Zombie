@@ -67,7 +67,7 @@ var foundation_tile
 
 # Called when the node enters the scene tree for the first time.
 func _ready():	
-	generate_world()
+	select_biome()	
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):	
@@ -108,7 +108,7 @@ func find_valid_tiles(cell):
 	
 func generate_world():
 	# A random number generator which we will use for the noise seed
-	var tilelist = [0, 11, 12, 3, 4, 5]
+	var tilelist = [0, 1, 2, 3, 4, 5]
 	
 	#var rng = RandomNumberGenerator.new()zz
 	fastNoiseLite.seed = rng.randi_range(0, 256)
@@ -128,6 +128,53 @@ func generate_world():
 			progresscount += 1	
 
 	spawn_structures()
+
+func generate_moon():
+	# A random number generator which we will use for the noise seed
+	var tilelist = [19, 17, 13, 14, 15, 16]
+	
+	#var rng = RandomNumberGenerator.new()zz
+	fastNoiseLite.seed = rng.randi_range(0, 256)
+	fastNoiseLite.TYPE_PERLIN
+	fastNoiseLite.fractal_octaves = tilelist.size()
+	fastNoiseLite.fractal_gain = 0
+	
+	for x in grid_width:
+		grid.append([])
+		await get_tree().create_timer(0).timeout
+		for y in grid_height:
+			grid[x].append(0)
+			# We get the noise coordinate as an absolute value (which represents the gradient - or layer)	
+			var absNoise = abs(fastNoiseLite.get_noise_2d(x,y))
+			var tiletoplace = int(floor((absNoise * tilelist.size())))
+			Map.set_cell(0, Vector2i(x,y), tilelist[tiletoplace], Vector2i(0, 0), 0)	
+			progresscount += 1	
+
+	spawn_structures()
+
+func generate_mars():
+	# A random number generator which we will use for the noise seed
+	var tilelist = [26, 24, 20, 21, 22, 23]
+	
+	#var rng = RandomNumberGenerator.new()zz
+	fastNoiseLite.seed = rng.randi_range(0, 256)
+	fastNoiseLite.TYPE_PERLIN
+	fastNoiseLite.fractal_octaves = tilelist.size()
+	fastNoiseLite.fractal_gain = 0
+	
+	for x in grid_width:
+		grid.append([])
+		await get_tree().create_timer(0).timeout
+		for y in grid_height:
+			grid[x].append(0)
+			# We get the noise coordinate as an absolute value (which represents the gradient - or layer)	
+			var absNoise = abs(fastNoiseLite.get_noise_2d(x,y))
+			var tiletoplace = int(floor((absNoise * tilelist.size())))
+			Map.set_cell(0, Vector2i(x,y), tilelist[tiletoplace], Vector2i(0, 0), 0)	
+			progresscount += 1	
+
+	spawn_structures()
+
 
 func spawn_structures():						
 	# Randomize structures at start	
@@ -230,10 +277,102 @@ func spawn_structures():
 		towerblank_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
 		progresscount += 1
 		
-	environment_tiles()
-
-func environment_tiles():
+		
+	if biome == 0:
+		environment_tiles()
+	if biome == 1:
+		environment_tiles_mars()
+	if biome == 2:
+		environment_tiles_moon()		
+	
+func environment_tiles():	
 	var tile_random_id = rng.randi_range(3, 5)
+	# Tiles
+	for h in structures_blank.size():
+		var structure_group = get_tree().get_nodes_in_group("structuresblank")
+		var structure_global_pos = structure_group[h].position
+		var structure_pos = Map.local_to_map(structure_global_pos)
+		map_pos = structure_pos
+		
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)	
+			await get_tree().create_timer(0).timeout
+			progresscount += 1	
+			
+	await spawn_towersblank()			
+
+func environment_tiles_moon():	
+	var tile_random_id = rng.randi_range(14, 16)
+	# Tiles
+	for h in structures_blank.size():
+		var structure_group = get_tree().get_nodes_in_group("structuresblank")
+		var structure_global_pos = structure_group[h].position
+		var structure_pos = Map.local_to_map(structure_global_pos)
+		map_pos = structure_pos
+		
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)	
+			await get_tree().create_timer(0).timeout
+			progresscount += 1	
+			
+	await spawn_towersblank()			
+
+func environment_tiles_mars():	
+	var tile_random_id = rng.randi_range(21, 23)
 	# Tiles
 	for h in structures_blank.size():
 		var structure_group = get_tree().get_nodes_in_group("structuresblank")
@@ -484,7 +623,17 @@ func check_duplicates(a):
 				a[j].z_index = tile_pos_j.x + tile_pos_j.y
 				Map.astar_grid.set_point_solid(j_pos, true)
 
-
+func select_biome():	
+	biome = rng.randi_range(0, 2)	
+	if biome == 0:		
+		generate_world()
+		world = true
+	if biome == 1:		
+		generate_mars()
+		mars = true
+	if biome == 2:		
+		generate_moon()	
+		moon = true	
 		
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
