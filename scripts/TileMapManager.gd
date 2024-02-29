@@ -228,6 +228,8 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 						
+						get_node("../Arrow").hide()
+						get_node("../Arrow2").hide()	
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
@@ -291,9 +293,9 @@ func _input(event):
 							moving = false					
 
 					#projectile drop
-					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog":
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog":
 						var tile_position = map_to_local(Vector2i(tile_pos)) + Vector2(0,0) / 2
-						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y))
+						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y-16))
 						for i in cpu_units.size():
 							if cpu_units[i].tile_pos == clicked_pos:
 								cpu_units[i].get_child(0).play("death")
@@ -303,11 +305,12 @@ func _input(event):
 								cpu_units[i].remove_from_group("zombies") 
 								get_node("../TileMap").moving = false
 								
+						get_node("../Arrow").hide()
+						get_node("../Arrow2").hide()		
 						await get_tree().create_timer(1).timeout
 						_on_zombie()
 						
-					#Attack Container Below
-							
+					#Attack Container Below							
 					#landmine drop
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Butch":
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
@@ -583,7 +586,8 @@ func _input(event):
 				
 																												
 
-		if event.button_index == MOUSE_BUTTON_RIGHT:				
+		if event.button_index == MOUSE_BUTTON_RIGHT:	
+			hovertile.show()			
 			#Remove hover tiles										
 			for j in grid_height:
 				for k in grid_width:
