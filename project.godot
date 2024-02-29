@@ -28,8 +28,13 @@ Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
 
 [dialogic]
 
-directories/dch_directory={}
-directories/dtl_directory={}
+directories/dch_directory={
+"Butch": "res://timeline/Butch.dch",
+"Snake": "res://timeline/Snake.dch"
+}
+directories/dtl_directory={
+"timeline": "res://timeline/timeline.dtl"
+}
 text/letter_speed=0.01
 text/initial_text_reveal_skippable=true
 text/text_reveal_skip_delay=0.1
@@ -46,9 +51,12 @@ choices/reveal_by_input=false
 save/autosave_delay=60.0
 save/encryption_on_exports_only=true
 text/autopauses={}
-layout/style_list=["res://timeline/style.tres"]
-layout/default_style="res://timeline/style.tres"
-variables={}
+layout/style_list=["res://timeline/speaker.tres"]
+layout/default_style="res://timeline/speaker.tres"
+variables={
+"dialogue_end": false
+}
+glossary/default_case_sensitive=true
 
 [display]
 
