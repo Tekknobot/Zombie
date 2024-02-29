@@ -63,8 +63,6 @@ var progresscount: int
 var biome
 var foundation_tile
 
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():	
 	select_biome()	
@@ -174,7 +172,6 @@ func generate_mars():
 			progresscount += 1	
 
 	spawn_structures()
-
 
 func spawn_structures():						
 	# Randomize structures at start	
@@ -612,6 +609,10 @@ func check_duplicates(a):
 				a[i].position.y -= 500
 				a[i].z_index = tile_pos_i.x + tile_pos_i.y
 				Map.astar_grid.set_point_solid(i_pos, false)
+				
+				#Empty foundation indicator
+				#Map.set_cell(0, i_pos, 48, Vector2i(0, 0), 0)
+				Map.astar_grid.set_point_solid(i_pos, false)	
 								
 				var j_pos = Map.local_to_map(a[j].position)	
 				var j_global = Map.map_to_local(Vector2i(j_pos.x, j_pos.y)) + Vector2(0,0) / 2	
@@ -620,7 +621,7 @@ func check_duplicates(a):
 				#a[j].get_child(0).modulate = Color8(0, 0, 0)
 				a[j].get_child(0).modulate.a = 1	
 				a[j].z_index = tile_pos_j.x + tile_pos_j.y
-				Map.astar_grid.set_point_solid(j_pos, true)
+				Map.astar_grid.set_point_solid(j_pos, true)				
 
 func select_biome():	
 	biome = rng.randi_range(0, 2)	
