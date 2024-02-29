@@ -305,6 +305,8 @@ func _input(event):
 								
 						await get_tree().create_timer(1).timeout
 						_on_zombie()
+						
+					#Attack Container Below
 							
 					#landmine drop
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Butch":
