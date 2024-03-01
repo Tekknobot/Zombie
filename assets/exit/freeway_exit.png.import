@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6n5hymm5turx"
-path="res://.godot/imported/Blue_CIVIC_CLEAN1.png-d2b5c374b1da7e84d1921f7d00fe6d1b.ctex"
+uid="uid://bsgykkv8fna2r"
+path="res://.godot/imported/freeway_exit.png-3992fac3974c522a81f873efbc583ded.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/vehicles/Blue_CIVIC_CLEAN1.png"
-dest_files=["res://.godot/imported/Blue_CIVIC_CLEAN1.png-d2b5c374b1da7e84d1921f7d00fe6d1b.ctex"]
+source_file="res://assets/exit/freeway_exit.png"
+dest_files=["res://.godot/imported/freeway_exit.png-3992fac3974c522a81f873efbc583ded.ctex"]
 
 [params]
 
