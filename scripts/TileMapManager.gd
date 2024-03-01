@@ -1523,12 +1523,13 @@ func check_zombies_dead():
 	dead_zombies = get_tree().get_nodes_in_group("dead")
 			
 	if dead_zombies.size() == cpu_units.size():
-		get_node("../Arrow").modulate.a = 0
-		get_node("../Arrow2").modulate.a = 0
 		print("Map Cleared!")
 		map_cleared = true	
 		next_button.show()
 		reset_button.hide()
+		await get_tree().create_timer(0).timeout
+		get_node("../Arrow").modulate.a = 0
+		get_node("../Arrow2").modulate.a = 0			
 
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
