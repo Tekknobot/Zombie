@@ -146,7 +146,7 @@ func _process(delta):
 		if self.unit_type == "Human":
 			return
 		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
-		var structure_pos = get_node("../TileMap").local_to_map(root.structures[i].position)
+		var structure_pos = get_node("../TileMap").local_to_map(structures[i].position)
 		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true:
 			if only_once == true:
 				only_once = false
