@@ -127,7 +127,7 @@ func spawn():
 		await get_tree().create_timer(0).timeout
 									
 	await get_tree().create_timer(1).timeout	
-	Dialogic.start('timeline')
+	#Dialogic.start('timeline')
 	spawn_complete = true
 	
 func get_random_numbers(from, to):

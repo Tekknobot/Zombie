@@ -18,6 +18,10 @@ var rng = RandomNumberGenerator.new()
 
 @onready var next_button = $"../Control/MenuContainer/NextButton"
 @onready var reset_button = $"../Control/MenuContainer/ResetButton"
+@onready var mines_button = $"../Control/AttacksContainer/LandmineButton"
+@onready var laser_button = $"../Control/AttacksContainer/LaserButton"
+
+@onready var laser = $"../Laser"
 
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 var resource = load("res://dialogue/dialogue.dialogue")
@@ -48,6 +52,7 @@ var only_once = true
 var only_once_zombie = true
 var attack_range = false
 var landmines_range = false
+var laser_range = false
 var dog_range = false
 
 var landmines = []
@@ -64,6 +69,9 @@ var map_cleared = false
 
 var landmine_once = true
 var landmine_temp
+
+var laser_a = Vector2(0,0)
+var laser_b = Vector2(0,0)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -189,8 +197,10 @@ func _input(event):
 						var right_clicked_pos = local_to_map(right_clicked_unit.position)
 						
 						#get_node("../Camera2D").shake(0.5, 30, 3)
-							
-						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
+						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
+						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
+						 	
+						await laser._draw()
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
@@ -311,8 +321,71 @@ func _input(event):
 						await get_tree().create_timer(1).timeout
 						_on_zombie()
 						
-					#Attack Container Below							
-					#landmine drop
+					#dog shoot laser
+					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and laser_range == true and right_clicked_unit.unit_name == "Robodog":
+						
+						if right_clicked_unit.unit_team == 1:
+							right_clicked_unit.attacked = true
+							right_clicked_unit.moved = true
+						
+						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
+						
+						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1	
+						
+						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_pos.x:
+							right_clicked_unit.scale.x = 1
+						
+						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_pos.x:
+							right_clicked_unit.scale.x = -1																																					
+												
+						right_clicked_unit.get_child(0).play("attack")	
+						
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")		
+						
+						var _bumpedvector = clicked_pos
+						var right_clicked_pos = local_to_map(right_clicked_unit.position)
+						
+						#get_node("../Camera2D").shake(0.5, 30, 3)
+						
+						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
+						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
+							
+						await laser.draw_laser()
+						all_units[h].get_child(0).set_offset(Vector2(0,0))
+													
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+
+						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
+
+						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
+						
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:		
+							var tween: Tween = create_tween()
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+						
+						get_node("../Arrow").hide()
+						get_node("../Arrow2").hide()	
+
+						#Remove hover tiles										
+						for j in grid_height:
+							for k in grid_width:
+								set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+													
+						await get_tree().create_timer(1).timeout
+						_on_zombie()	
+												
+					#place landmine
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Butch":
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
@@ -681,16 +754,7 @@ func _input(event):
 			if tile_pos.y == 15:
 				set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
-		if event is InputEventMouseButton:
-			if event.button_index == MOUSE_BUTTON_LEFT:
-				if event.pressed:
-					#print("Left button was clicked at ", event.position)
-					pass
-				else:
-					#print("Left button was released")
-					pass
-				
-		
+						
 func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	zombies = get_tree().get_nodes_in_group("zombies")
 	
@@ -1100,6 +1164,8 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 	
 	attacks_container.show()
+	mines_button.show()
+	laser_button.hide()	
 
 func show_rambo_attack_range():
 	#Remove hover tiles										
@@ -1269,6 +1335,7 @@ func show_dog_movement_range():
 	#Place hover tiles		
 	for i in dogs.size():
 		var unit_pos = local_to_map(dogs[i].position)
+		left_clicked_unit_position = dogs[i].position		
 		if unit_pos == tile_pos:
 			#Place hover tiles on all tiles										
 			for j in grid_height:
@@ -1276,7 +1343,9 @@ func show_dog_movement_range():
 					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
 					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
 					
-	attacks_container.hide()				
+	attacks_container.show()	
+	mines_button.hide()
+	laser_button.show()			
 
 func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
@@ -1369,8 +1438,7 @@ func show_humans_landmine_range():
 									hoverflag_4 = false
 									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
 									break
-
-			
+	
 	if tile_pos.x == 0:
 		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
 	if tile_pos.y == 0:
@@ -1450,3 +1518,83 @@ func check_humans_dead():
 
 func _on_next_button_pressed():
 	get_tree().reload_current_scene()
+
+func _on_laser_button_pressed():
+	show_laser_range()
+
+func show_laser_range():
+	hovertile.show()			
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+																	
+	var tile_pos = local_to_map(left_clicked_unit_position)		
+	var tile_data = get_cell_tile_data(0, tile_pos)
+
+	if tile_data is TileData:				
+		for i in user_units.size():
+			var unit_pos = local_to_map(user_units[i].position)
+
+			if unit_pos == tile_pos:
+				laser_range = true
+				right_clicked_unit = user_units[i]		
+								
+				var hoverflag_1 = true															
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_1 == true:
+						for k in node2D.structures.size():
+							if tile_pos.x-j >= 0:	
+								set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
+									hoverflag_1 = false
+									set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
+									break	
+						
+				var hoverflag_2 = true										
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_2 == true:											
+						for k in node2D.structures.size():																						
+							if tile_pos.y+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
+									hoverflag_2 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
+									break
+
+				var hoverflag_3 = true	
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_3 == true:											
+						for k in node2D.structures.size():																													
+							if tile_pos.x+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
+									hoverflag_3 = false
+									set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
+									break
+
+				var hoverflag_4 = true	
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_4 == true:											
+						for k in node2D.structures.size():																											
+							if tile_pos.y-j >= 0:									
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
+									hoverflag_4 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
+									break
+				
+		if tile_pos.x == 0:
+			set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+		if tile_pos.y == 0:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+		if tile_pos.x == 15:
+			set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+		if tile_pos.y == 15:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
+
+	

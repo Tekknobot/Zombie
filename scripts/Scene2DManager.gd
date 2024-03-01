@@ -63,13 +63,17 @@ var progresscount: int
 var biome
 var foundation_tile
 
+var laser_a = Vector2(0,0)
+var laser_b = Vector2(0,0)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():	
 	select_biome()	
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):	
-	pass
+func _process(_delta):
+	pass	
+	
 	
 func _input(event):
 	pass														
@@ -637,4 +641,5 @@ func select_biome():
 		
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
+	
 	
