@@ -29,12 +29,12 @@ func draw_laser():
 	curve.add_point(Map.laser_b, Vector2(0,0), Vector2.ZERO)
 	line_2d.points = curve.get_baked_points()
 
-	for i in 10:
+	for i in 7:
 		line_2d.set_width(1)	
-		line_2d.set_default_color(Color.ORANGE)	
+		line_2d.set_default_color(Color.RED)	
 		await get_tree().create_timer(0.05).timeout
-		line_2d.set_width(2)
-		line_2d.set_default_color(Color.WHITE)
+		line_2d.set_width(3)
+		line_2d.set_default_color(Color.PALE_VIOLET_RED)
 		await get_tree().create_timer(0.05).timeout
 		
 	line_2d.hide()	
