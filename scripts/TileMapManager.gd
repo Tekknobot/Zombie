@@ -354,6 +354,9 @@ func _input(event):
 						
 						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
 						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
+
+						get_node("../Arrow").hide()
+						get_node("../Arrow2").hide()
 							
 						await laser.draw_laser()
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
