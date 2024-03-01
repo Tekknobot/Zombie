@@ -19,7 +19,7 @@ var rng = RandomNumberGenerator.new()
 @onready var next_button = $"../Control/MenuContainer/NextButton"
 @onready var reset_button = $"../Control/MenuContainer/ResetButton"
 @onready var mines_button = $"../Control/AttacksContainer/LandmineButton"
-@onready var laser_button = $"../Control/AttacksContainer/LaserButton"
+@onready var dog_mines_button = $"../Control/AttacksContainer/DogmineButton"
 
 @onready var laser = $"../Laser"
 
@@ -52,7 +52,7 @@ var only_once = true
 var only_once_zombie = true
 var attack_range = false
 var landmines_range = false
-var laser_range = false
+var dogmine_range = false
 var dog_range = false
 
 var landmines = []
@@ -200,7 +200,7 @@ func _input(event):
 						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
 						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
 						 	
-						await laser._draw()
+						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
@@ -245,7 +245,7 @@ func _input(event):
 						_on_zombie()	
 
 					#landmine run
-					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake":
+					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake" and dogmine_range == true:
 						#Move unit
 						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
 							if dead_humans.size() == 2:					
@@ -322,7 +322,7 @@ func _input(event):
 						_on_zombie()
 						
 					#dog shoot laser
-					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and laser_range == true and right_clicked_unit.unit_name == "Robodog":
+					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and right_clicked_unit.unit_name == "Robodog":
 						
 						if right_clicked_unit.unit_team == 1:
 							right_clicked_unit.attacked = true
@@ -358,19 +358,39 @@ func _input(event):
 						await laser.draw_laser()
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
-						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:
+						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y	
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
 
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
 						
-						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:		
+						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							get_node("../TileMap").all_units[h].position = clicked_pos
+							all_units[h].position = tile_center_pos	
+							var unit_pos = local_to_map(all_units[h].position)										
+							all_units[h].z_index = unit_pos.x + unit_pos.y		
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 						
@@ -1165,7 +1185,7 @@ func show_humans_movement_range():
 	
 	attacks_container.show()
 	mines_button.show()
-	laser_button.hide()	
+	dog_mines_button.hide()	
 
 func show_rambo_attack_range():
 	#Remove hover tiles										
@@ -1345,7 +1365,7 @@ func show_dog_movement_range():
 					
 	attacks_container.show()	
 	mines_button.hide()
-	laser_button.show()			
+	dog_mines_button.show()			
 
 func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
@@ -1537,7 +1557,7 @@ func show_laser_range():
 			var unit_pos = local_to_map(user_units[i].position)
 
 			if unit_pos == tile_pos:
-				laser_range = true
+				dogmine_range = true
 				right_clicked_unit = user_units[i]		
 								
 				var hoverflag_1 = true															
