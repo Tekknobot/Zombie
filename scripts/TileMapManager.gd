@@ -294,7 +294,7 @@ func _input(event):
 							moving = false					
 
 					#projectile drop
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog":
+					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog" and left_clicked_unit.unit_name != "Butch" and left_clicked_unit.unit_name != "Robodog":
 						var tile_position = map_to_local(Vector2i(tile_pos)) + Vector2(0,0) / 2
 						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y-16))
 						for i in cpu_units.size():
