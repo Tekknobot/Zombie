@@ -97,7 +97,6 @@ func _process(delta):
 	else:
 		get_node("../TileMap").astar_grid.set_point_solid(tile_pos, true)	
 
-
 	if self.moved == true and self.attacked == true:
 		self.modulate = Color8(110, 110, 110)
 	else:
@@ -196,6 +195,9 @@ func landmine_collisions():
 			self.get_child(0).play("death")	
 			get_node("../TileMap").landmines_total -= 1	
 			get_node("../TileMap").moving = false
+	
+	get_node("../Arrow").hide()
+	get_node("../Arrow2").hide()
 
 func structure_collisions():		
 	#Structure collisions			

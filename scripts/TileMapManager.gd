@@ -681,8 +681,6 @@ func _input(event):
 									for n in grid_width:
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)	
 				
-																												
-
 		if event.button_index == MOUSE_BUTTON_RIGHT:	
 			hovertile.show()			
 			#Remove hover tiles										
@@ -777,7 +775,7 @@ func _input(event):
 func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	zombies = get_tree().get_nodes_in_group("zombies")
 	
-	if !closest_zombie_to_human:
+	if !closest_zombie_to_human:		
 		return
 	
 	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("humans dead"):
@@ -1489,7 +1487,6 @@ func _on_zombie():
 	
 	moving = false		
 	
-	get_node("../Arrow").show()
 	humans = get_tree().get_nodes_in_group("humans")
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
