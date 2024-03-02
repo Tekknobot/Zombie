@@ -723,7 +723,7 @@ func _input(event):
 								for k in node2D.structures.size():
 									if tile_pos.x-j >= 0:	
 										set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
-										if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
+										if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
 											hoverflag_1 = false
 											set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
 											break	
@@ -735,7 +735,7 @@ func _input(event):
 								for k in node2D.structures.size():																						
 									if tile_pos.y+j <= 16:
 										set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
-										if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
+										if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
 											hoverflag_2 = false
 											set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
 											break
@@ -747,7 +747,7 @@ func _input(event):
 								for k in node2D.structures.size():																													
 									if tile_pos.x+j <= 16:
 										set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
-										if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
+										if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
 											hoverflag_3 = false
 											set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
 											break
@@ -759,7 +759,7 @@ func _input(event):
 								for k in node2D.structures.size():																											
 									if tile_pos.y-j >= 0:									
 										set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
-										if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
+										if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
 											hoverflag_4 = false
 											set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
 											break

@@ -199,7 +199,7 @@ func landmine_collisions():
 func structure_collisions():		
 	#Structure collisions			
 	for i in structures.size():
-		var unit_center_pos = get_node("../TileMap").local_to_map(structures[i].position)
+		var unit_center_pos = get_node("../TileMap").local_to_map(self.position)
 		var structure_pos = get_node("../TileMap").local_to_map(get_node("/root/Scene2D").structures[i].position)
 		if unit_center_pos == structure_pos and get_node("../SpawnManager").spawn_complete == true:
 			self.get_child(0).play("death")
