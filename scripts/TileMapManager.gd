@@ -24,7 +24,6 @@ var rng = RandomNumberGenerator.new()
 @onready var laser = $"../Laser"
 
 var projectile = preload("res://scenes/projectiles/projectile.scn")
-var resource = load("res://dialogue/dialogue.dialogue")
 
 var astar_grid = AStarGrid2D.new()
 var clicked_pos = Vector2i(0,0);

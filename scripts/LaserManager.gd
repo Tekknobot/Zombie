@@ -12,6 +12,8 @@ var color : Color = Color.RED
 
 var _point2 : Vector2
 
+var blood = preload("res://scenes/blood.scn")
+
 func _process(_delta):
 	pass
 
@@ -36,6 +38,7 @@ func draw_laser():
 		line_2d.set_width(3)
 		line_2d.set_default_color(Color.PALE_VIOLET_RED)
 		await get_tree().create_timer(0.05).timeout
-		
+			
 	line_2d.hide()	
 	get_node("../TileMap").hovertile.show()
+	
