@@ -350,6 +350,7 @@ func _input(event):
 											
 					#landmine run
 					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake" and dogmine_range == true:
+						dogmine_range = false
 						#Move unit
 						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
 							if dead_humans.size() == 2:					
