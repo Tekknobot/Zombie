@@ -13,6 +13,7 @@ var color : Color = Color.RED
 var _point2 : Vector2
 
 var explosion = preload("res://scenes/vfx/explosion.scn")
+var blood = preload("res://scenes/vfx/blood.scn")
 
 func _process(_delta):
 	pass
@@ -27,16 +28,24 @@ func draw_laser():
 	line_2d.show()		
 	line_2d.set_joint_mode(2)
 	var curve := Curve2D.new()
-	curve.add_point(Map.laser_a, Vector2.ZERO, Vector2(0,0))
+	var emitter = Vector2(Map.laser_a.x, Map.laser_a.y-500)
+	curve.add_point(emitter, Vector2.ZERO, Vector2(0,0))
 	curve.add_point(Map.laser_b, Vector2(0,0), Vector2.ZERO)
 	line_2d.points = curve.get_baked_points()
 
+	var blood_instance = blood.instantiate()
+	var blood_position = Map.laser_b
+	get_parent().add_child(blood_instance)
+	blood_instance.position = blood_position
+	blood_instance.emitting = true	
+
 	for i in 7:
+		line_2d.set_antialiased(false)
 		line_2d.set_width(1)	
 		line_2d.set_default_color(Color.RED)	
 		await get_tree().create_timer(0.05).timeout
-		line_2d.set_width(3)
-		line_2d.set_default_color(Color.PALE_VIOLET_RED)
+		line_2d.set_width(1)
+		line_2d.set_default_color(Color.GRAY)
 		await get_tree().create_timer(0.05).timeout
 
 	var explosion_instance = explosion.instantiate()
