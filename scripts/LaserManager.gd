@@ -12,7 +12,7 @@ var color : Color = Color.RED
 
 var _point2 : Vector2
 
-var blood = preload("res://scenes/blood.scn")
+var explosion = preload("res://scenes/vfx/explosion.scn")
 
 func _process(_delta):
 	pass
@@ -38,6 +38,13 @@ func draw_laser():
 		line_2d.set_width(3)
 		line_2d.set_default_color(Color.PALE_VIOLET_RED)
 		await get_tree().create_timer(0.05).timeout
+
+	var explosion_instance = explosion.instantiate()
+	var explosion_position = Map.laser_b
+	var tile_pos = get_node("../TileMap").local_to_map(Map.laser_b)
+	get_parent().add_child(explosion_instance)
+	explosion_instance.position = explosion_position
+	explosion_instance.z_index = (tile_pos.x + tile_pos.y) + 4
 			
 	line_2d.hide()	
 	get_node("../TileMap").hovertile.show()
