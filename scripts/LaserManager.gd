@@ -45,7 +45,7 @@ func draw_laser():
 		line_2d.set_default_color(Color.RED)	
 		await get_tree().create_timer(0.05).timeout
 		line_2d.set_width(2)
-		line_2d.set_default_color(Color.GRAY)
+		line_2d.set_default_color(Color.PALE_VIOLET_RED)
 		await get_tree().create_timer(0.05).timeout
 
 	var explosion_instance = explosion.instantiate()

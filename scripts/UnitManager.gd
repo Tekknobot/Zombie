@@ -168,11 +168,12 @@ func _process(delta):
 				get_parent().add_child(explosion_instance)
 				explosion_instance.position = explosion_position	
 				explosion_instance.position.y -= 16
-				explosion_instance.z_index = (structure_pos.x + structure_pos.y) + 1				
-				get_node("/root/Scene2D").structures[i].get_child(0).play("demolished")
-				get_node("/root/Scene2D").structures[i].get_child(0).modulate = Color8(255, 255, 255) 		
+				explosion_instance.z_index = (structure_pos.x + structure_pos.y) + 1
+				var demo_structure = structures[i]				
+				demo_structure.get_child(0).play("demolished")
+				demo_structure.get_child(0).modulate = Color8(255, 255, 255) 		
 				get_node("../TileMap").moving = false	
-			break
+			
 
 func landmine_collisions():			
 	var unit_center_pos = get_node("../TileMap").local_to_map(self.position)		
