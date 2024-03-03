@@ -72,10 +72,6 @@ func _ready():
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	pass	
-	
-	
-func _input(event):
 	pass														
 
 func move(dir):
@@ -593,7 +589,7 @@ func add_to_structures_array():
 
 func check_duplicates(a):
 	var is_dupe = false
-	var found_dupe = false 
+	#var found_dupe = false 
 
 	for i in range(a.size()):
 		if is_dupe == true:
@@ -601,7 +597,7 @@ func check_duplicates(a):
 		for j in range(a.size()):
 			if a[j].position == a[i].position:
 				#is_dupe = true
-				found_dupe = true
+				#found_dupe = true
 				#print("duplicate")
 				
 				var i_pos = Map.local_to_map(a[i].position)	
