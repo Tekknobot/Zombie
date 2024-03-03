@@ -54,6 +54,7 @@ var districtsblank = []
 var world = false
 var mars = false
 var moon = false
+var saturn = false
 
 var tile_num = 1
 var my_odd_x: int
@@ -173,6 +174,30 @@ func generate_mars():
 
 	spawn_structures()
 
+func generate_saturn():
+	# A random number generator which we will use for the noise seed
+	var tilelist = [31, 30, 25, 27, 28, 29]
+	
+	#var rng = RandomNumberGenerator.new()zz
+	fastNoiseLite.seed = rng.randi_range(0, 256)
+	fastNoiseLite.TYPE_PERLIN
+	fastNoiseLite.fractal_octaves = tilelist.size()
+	fastNoiseLite.fractal_gain = 0
+	
+	for x in grid_width:
+		grid.append([])
+		await get_tree().create_timer(0).timeout
+		for y in grid_height:
+			grid[x].append(0)
+			# We get the noise coordinate as an absolute value (which represents the gradient - or layer)	
+			var absNoise = abs(fastNoiseLite.get_noise_2d(x,y))
+			var tiletoplace = int(floor((absNoise * tilelist.size())))
+			Map.set_cell(0, Vector2i(x,y), tilelist[tiletoplace], Vector2i(0, 0), 0)	
+			progresscount += 1	
+
+	spawn_structures()
+
+
 func spawn_structures():						
 	# Randomize structures at start	
 	for i in 64: #buildings
@@ -280,7 +305,9 @@ func spawn_structures():
 		environment_tiles_mars()
 	if biome == 2:
 		environment_tiles_moon()		
-	
+	if biome == 3:
+		environment_tiles_saturn()
+			
 func environment_tiles():	
 	var tile_random_id = rng.randi_range(3, 5)
 	# Tiles
@@ -369,6 +396,49 @@ func environment_tiles_moon():
 
 func environment_tiles_mars():	
 	var tile_random_id = rng.randi_range(21, 23)
+	# Tiles
+	for h in structures_blank.size():
+		var structure_group = get_tree().get_nodes_in_group("structuresblank")
+		var structure_global_pos = structure_group[h].position
+		var structure_pos = Map.local_to_map(structure_global_pos)
+		map_pos = structure_pos
+		
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)
+			await get_tree().create_timer(0).timeout
+			progresscount += 1
+		map_pos = structure_pos
+		for i in tile_num:
+			tile_id = tile_random_id
+			var size = moves.size()
+			var random_key = moves.keys()[randi() % size]					
+			move(random_key)	
+			await get_tree().create_timer(0).timeout
+			progresscount += 1	
+			
+	await spawn_towersblank()			
+
+func environment_tiles_saturn():	
+	var tile_random_id = rng.randi_range(27, 29)
 	# Tiles
 	for h in structures_blank.size():
 		var structure_group = get_tree().get_nodes_in_group("structuresblank")
@@ -624,7 +694,7 @@ func check_duplicates(a):
 				Map.astar_grid.set_point_solid(j_pos, true)				
 
 func select_biome():	
-	biome = rng.randi_range(0, 2)	
+	biome = rng.randi_range(0, 3)	
 	if biome == 0:		
 		generate_world()
 		world = true
@@ -634,7 +704,10 @@ func select_biome():
 	if biome == 2:		
 		generate_moon()	
 		moon = true	
-		
+	if biome == 3:		
+		generate_saturn()	
+		saturn = true	
+				
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
 	
