@@ -166,7 +166,7 @@ func _input(event):
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 					left_clicked_unit = all_units[h]
 					
-					#projectile	
+					#Projectile shoot	
 					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false and right_clicked_unit.unit_name == "Butch":
 						
 						if right_clicked_unit.unit_team == 1:
@@ -263,7 +263,7 @@ func _input(event):
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
-					#dog shoot laser
+					#Dog orbital laser
 					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and right_clicked_unit.unit_name == "Robodog":
 						
 						if right_clicked_unit.unit_team == 1:
@@ -311,6 +311,11 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y	
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 								
 
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -319,7 +324,12 @@ func _input(event):
 							var unit_pos = local_to_map(all_units[h].position)										
 							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 																				
 
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -329,7 +339,12 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
-						
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 		
+													
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -338,6 +353,11 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y		
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 								
 						
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()	
@@ -350,7 +370,7 @@ func _input(event):
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
-					#projectile drop
+					#Projectile drop
 					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog" and left_clicked_unit.unit_name != "Butch" and left_clicked_unit.unit_name != "Robodog":
 						var tile_position = map_to_local(Vector2i(tile_pos)) + Vector2(0,0) / 2
 						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y-16))
@@ -368,7 +388,7 @@ func _input(event):
 						await get_tree().create_timer(1).timeout
 						_on_zombie()
 											
-					#landmine run
+					#Landmine run
 					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake" and dogmine_range == true:
 						dogmine_range = false
 						#Move unit
@@ -427,7 +447,7 @@ func _input(event):
 								
 							_on_zombie()				
 							
-					#place landmine
+					#Place landmine
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_type == "Human" and landmines_range == true:
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
