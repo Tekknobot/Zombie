@@ -409,7 +409,7 @@ func _input(event):
 							moving = false					
 							
 					#place landmine
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Butch":
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_type == "Human":
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
@@ -771,6 +771,43 @@ func _input(event):
 			if tile_pos.y == 15:
 				set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
+func _on_zombie():	
+	zombie_button.hide()
+	landmine_once = true
+	
+	for i in user_units.size():
+		modulate = Color8(255, 255, 255)
+		user_units[i].moved = false
+		user_units[i].attacked = false
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	moving = false		
+	
+	humans = get_tree().get_nodes_in_group("humans")
+	var target_human = rng.randi_range(0,humans.size()-1)
+	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
+	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
+	if closest_zombie_to_human == null:
+		return
+	if !humans[target_human].is_in_group("humans dead") and !closest_zombie_to_human.is_in_group("dead"):
+		get_node("../Arrow2").show()
+		get_node("../Arrow2").position = humans[target_human].position
+		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
+		get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
+
+		get_node("../Arrow").show()
+		get_node("../Arrow").position = closest_zombie_to_human.position
+		var arrow_pos = local_to_map(get_node("../Arrow").position)
+		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
+	else:		
+		_on_zombie()
+		return		
+	
+	await zombie_attack_ai(target_human, closest_zombie_to_human)
 						
 func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -1333,63 +1370,81 @@ func show_rambo_attack_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 48, Vector2i(0, 0), 0)				
 	
 	attacks_container.show()
-	
-func show_dog_movement_range():
+
+func show_laser_range():
+	hovertile.show()			
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-
-	for i in user_units.size():
-		user_units[i].get_child(0).play("default")
-	
-	var mouse_pos = get_global_mouse_position()
-	mouse_pos.y += 8
-	var tile_pos = local_to_map(mouse_pos)	
+																	
+	var tile_pos = local_to_map(left_clicked_unit_position)		
 	var tile_data = get_cell_tile_data(0, tile_pos)
-	humans = get_tree().get_nodes_in_group("humans")
-	
-	#Place hover tiles		
-	for i in dogs.size():
-		var unit_pos = local_to_map(dogs[i].position)
-		left_clicked_unit_position = dogs[i].position		
-		if unit_pos == tile_pos:
-			#Place hover tiles on all tiles										
-			for j in grid_height:
-				for k in grid_width:
-					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
-					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
-					
-	attacks_container.show()	
-	mines_button.hide()
-	dog_mines_button.show()			
 
-func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
-	get_node("../Seeker").show()
-	var _a = get_node("../TileMap").local_to_map(a)
-	var _b = get_node("../TileMap").local_to_map(b)		
-	
-	get_node("../Seeker").position = a
-	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
-	var tween: Tween = create_tween()
-	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
-	await get_tree().create_timer(1).timeout	
+	if tile_data is TileData:				
+		for i in user_units.size():
+			var unit_pos = local_to_map(user_units[i].position)
 
-	get_node("../Seeker").hide()		
+			if unit_pos == tile_pos:
+				dogmine_range = true
+				right_clicked_unit = user_units[i]		
+								
+				var hoverflag_1 = true															
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_1 == true:
+						for k in node2D.structures.size():
+							if tile_pos.x-j >= 0:	
+								set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
+									hoverflag_1 = false
+									set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
+									break	
+						
+				var hoverflag_2 = true										
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_2 == true:											
+						for k in node2D.structures.size():																						
+							if tile_pos.y+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
+									hoverflag_2 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
+									break
 
-	var explosion = preload("res://scenes/vfx/explosion.scn")
-	var explosion_instance = explosion.instantiate()
-	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
-	explosion_instance.set_name("explosion")
-	get_parent().add_child(explosion_instance)
-	explosion_instance.position = explosion_position	
-	explosion_instance.position.y -= 16
-	explosion_instance.z_index = (_b.x + _b.y) + 1
+				var hoverflag_3 = true	
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_3 == true:											
+						for k in node2D.structures.size():																													
+							if tile_pos.x+j <= 16:
+								set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
+									hoverflag_3 = false
+									set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
+									break
 
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+				var hoverflag_4 = true	
+				for j in 16:	
+					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+					if hoverflag_4 == true:											
+						for k in node2D.structures.size():																											
+							if tile_pos.y-j >= 0:									
+								set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
+								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
+									hoverflag_4 = false
+									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
+									break
+				
+		if tile_pos.x == 0:
+			set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+		if tile_pos.y == 0:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+		if tile_pos.x == 15:
+			set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+		if tile_pos.y == 15:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
 
 func show_humans_landmine_range():				
 	#Remove hover tiles										
@@ -1467,47 +1522,36 @@ func show_humans_landmine_range():
 	
 	landmines_range = true
 	attack_range = false
-	
-func _on_landmine_button_pressed():
-	show_humans_landmine_range()
-
-func _on_zombie():	
-	zombie_button.hide()
-	landmine_once = true
-	
-	for i in user_units.size():
-		modulate = Color8(255, 255, 255)
-		user_units[i].moved = false
-		user_units[i].attacked = false
-
+		
+func show_dog_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-	
-	moving = false		
-	
-	humans = get_tree().get_nodes_in_group("humans")
-	var target_human = rng.randi_range(0,humans.size()-1)
-	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
-	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
-	if closest_zombie_to_human == null:
-		return
-	if !humans[target_human].is_in_group("humans dead") and !closest_zombie_to_human.is_in_group("dead"):
-		get_node("../Arrow2").show()
-		get_node("../Arrow2").position = humans[target_human].position
-		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
-		get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 
-		get_node("../Arrow").show()
-		get_node("../Arrow").position = closest_zombie_to_human.position
-		var arrow_pos = local_to_map(get_node("../Arrow").position)
-		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
-	else:		
-		_on_zombie()
-		return		
+	for i in user_units.size():
+		user_units[i].get_child(0).play("default")
 	
-	await zombie_attack_ai(target_human, closest_zombie_to_human)
+	var mouse_pos = get_global_mouse_position()
+	mouse_pos.y += 8
+	var tile_pos = local_to_map(mouse_pos)	
+	var tile_data = get_cell_tile_data(0, tile_pos)
+	humans = get_tree().get_nodes_in_group("humans")
+	
+	#Place hover tiles		
+	for i in dogs.size():
+		var unit_pos = local_to_map(dogs[i].position)
+		left_clicked_unit_position = dogs[i].position		
+		if unit_pos == tile_pos:
+			#Place hover tiles on all tiles										
+			for j in grid_height:
+				for k in grid_width:
+					set_cell(1, Vector2i(j,k), 10, Vector2i(0, 0), 0)
+					set_cell(1, unit_pos, -1, Vector2i(0, 0), 0)
+					
+	attacks_container.show()	
+	mines_button.hide()
+	dog_mines_button.show()			
 		
 func on_tween_finished():			
 	_on_zombie()
@@ -1533,85 +1577,38 @@ func check_humans_dead():
 		print("Zombies Win!")	
 		get_tree().reload_current_scene()
 
+func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
+	get_node("../Seeker").show()
+	var _a = get_node("../TileMap").local_to_map(a)
+	var _b = get_node("../TileMap").local_to_map(b)		
+	
+	get_node("../Seeker").position = a
+	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
+	var tween: Tween = create_tween()
+	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+	await get_tree().create_timer(1).timeout	
+
+	get_node("../Seeker").hide()		
+
+	var explosion = preload("res://scenes/vfx/explosion.scn")
+	var explosion_instance = explosion.instantiate()
+	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
+	explosion_instance.set_name("explosion")
+	get_parent().add_child(explosion_instance)
+	explosion_instance.position = explosion_position	
+	explosion_instance.position.y -= 16
+	explosion_instance.z_index = (_b.x + _b.y) + 1
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+
+func _on_landmine_button_pressed():
+	show_humans_landmine_range()
+	
 func _on_next_button_pressed():
 	get_tree().reload_current_scene()
 
 func _on_laser_button_pressed():
-	show_laser_range()
-
-func show_laser_range():
-	hovertile.show()			
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-																	
-	var tile_pos = local_to_map(left_clicked_unit_position)		
-	var tile_data = get_cell_tile_data(0, tile_pos)
-
-	if tile_data is TileData:				
-		for i in user_units.size():
-			var unit_pos = local_to_map(user_units[i].position)
-
-			if unit_pos == tile_pos:
-				dogmine_range = true
-				right_clicked_unit = user_units[i]		
-								
-				var hoverflag_1 = true															
-				for j in 16:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_1 == true:
-						for k in node2D.structures.size():
-							if tile_pos.x-j >= 0:	
-								set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
-									hoverflag_1 = false
-									set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
-									break	
-						
-				var hoverflag_2 = true										
-				for j in 16:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_2 == true:											
-						for k in node2D.structures.size():																						
-							if tile_pos.y+j <= 16:
-								set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
-									hoverflag_2 = false
-									set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
-									break
-
-				var hoverflag_3 = true	
-				for j in 16:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_3 == true:											
-						for k in node2D.structures.size():																													
-							if tile_pos.x+j <= 16:
-								set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
-									hoverflag_3 = false
-									set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
-									break
-
-				var hoverflag_4 = true	
-				for j in 16:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_4 == true:											
-						for k in node2D.structures.size():																											
-							if tile_pos.y-j >= 0:									
-								set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
-									hoverflag_4 = false
-									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
-									break
-				
-		if tile_pos.x == 0:
-			set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
-		if tile_pos.y == 0:
-			set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
-		if tile_pos.x == 15:
-			set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
-		if tile_pos.y == 15:
-			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
-
-	
+	show_laser_range()	
