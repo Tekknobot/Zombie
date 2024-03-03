@@ -13,6 +13,7 @@ var zombie = preload("res://scenes/sprites/Zombie.scn")
 var dog = preload("res://scenes/sprites/Dog.scn")
 var soldier = preload("res://scenes/sprites/Soldier.scn")
 var rambo = preload("res://scenes/sprites/Rambo.scn")
+var baby = preload("res://scenes/sprites/Baby.scn")
 
 var spawn_complete = false
 var zombie_init_count = 16
@@ -123,6 +124,30 @@ func spawn():
 		zomb.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
 		tween.tween_property(zomb, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
+		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
+		await get_tree().create_timer(0).timeout
+
+	await get_tree().create_timer(1).timeout
+	
+	# Find open tiles again
+	open_tiles.clear()	
+	for i in 16:
+		for j in 16:
+			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:			
+				open_tiles.append(Vector2i(i,j))
+	
+	random.clear()
+	random = get_random_numbers(0, open_tiles.size()/4)
+
+	# Drop Baby 
+	for i in 1:	
+		var baby_inst = baby.instantiate()
+		node2D.add_child(baby_inst)
+		baby_inst.add_to_group("baby")			
+		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
+		baby_inst.position = Vector2(new_position.x, new_position.y-500)
+		var tween: Tween = create_tween()
+		tween.tween_property(baby_inst, "position", new_position, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)	
 		get_node("../TileMap").astar_grid.set_point_solid(new_position, true)
 		await get_tree().create_timer(0).timeout
 									
