@@ -140,6 +140,23 @@ func _process(delta):
 			get_node("../TileMap").moving = false	
 			break
 
+	# Check for Player unit collisions	
+	for i in get_node("../TileMap").user_units.size():
+		if get_node("../TileMap").user_units[i] != self and self.position == get_node("../TileMap").user_units[i].position and self.unit_type == "Zombie" and !self.is_in_group("dead"):
+			self.get_child(0).play("death")
+			await get_tree().create_timer(0.5).timeout	
+			self.position.y -= 500		
+			self.add_to_group("dead")
+			self.remove_from_group("zombies")	
+			
+			get_node("../TileMap").cpu_units[i].get_child(0).play("death")
+			await get_tree().create_timer(0.5).timeout	
+			get_node("../TileMap").cpu_units[i].position.y -= 500		
+			get_node("../TileMap").cpu_units[i].add_to_group("dead")
+			get_node("../TileMap").cpu_units[i].remove_from_group("zombies")	
+			get_node("../TileMap").moving = false	
+			break
+
 	#Structure collisions			
 	for i in structures.size():
 		if self.unit_type == "Human":

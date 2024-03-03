@@ -210,6 +210,11 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y	
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 							
 
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -218,7 +223,12 @@ func _input(event):
 							var unit_pos = local_to_map(all_units[h].position)										
 							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)													
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 																				
 
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -227,7 +237,12 @@ func _input(event):
 							var unit_pos = local_to_map(all_units[h].position)										
 							all_units[h].z_index = unit_pos.x + unit_pos.y
 							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)	
+							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 								
 						
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
@@ -237,6 +252,11 @@ func _input(event):
 							all_units[h].z_index = unit_pos.x + unit_pos.y		
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
+							all_units[h].get_child(0).play("death")
+							await get_tree().create_timer(0.5).timeout	
+							all_units[h].position.y -= 500		
+							all_units[h].add_to_group("dead") 
+							all_units[h].remove_from_group("zombies") 							
 						
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()	
@@ -804,6 +824,7 @@ func _on_zombie():
 		_on_zombie()
 		return		
 	
+	moving = true
 	await zombie_attack_ai(target_human, closest_zombie_to_human)
 						
 func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
@@ -823,7 +844,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1 and structure_interupterd == false: 
-			moving = true
 			get_node("../Arrow").hide()
 			
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
