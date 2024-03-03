@@ -197,7 +197,6 @@ func generate_saturn():
 
 	spawn_structures()
 
-
 func spawn_structures():						
 	# Randomize structures at start	
 	for i in 64: #buildings
