@@ -341,7 +341,7 @@ func _input(event):
 								cpu_units[i].position.y -= 500		
 								cpu_units[i].add_to_group("dead") 
 								cpu_units[i].remove_from_group("zombies") 
-								get_node("../TileMap").moving = false
+								moving = false
 								
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()		
@@ -405,8 +405,7 @@ func _input(event):
 							user_units[selected_unit_num].kill_count = 2
 							user_units[selected_unit_num].get_child(0).play("default")
 								
-							_on_zombie()
-							moving = false					
+							_on_zombie()				
 							
 					#place landmine
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_type == "Human" and landmines_range == true:
@@ -616,8 +615,6 @@ func _input(event):
 									return
 									
 					_on_zombie()						
-					moving = false
-
 						
 				#Show movement range	
 				for i in all_units.size():				
@@ -681,7 +678,7 @@ func _input(event):
 									for n in grid_width:
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)	
 				
-		if event.button_index == MOUSE_BUTTON_RIGHT:	
+		if event.button_index == MOUSE_BUTTON_RIGHT and moving == false:	
 			hovertile.show()			
 			#Remove hover tiles										
 			for j in grid_height:
