@@ -886,7 +886,8 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 							
 				if h == closest_zombie_to_human.unit_movement:
 					break
-
+					
+			moving = false
 							
 			# Remove hover cells
 			for h in patharray.size():
@@ -919,6 +920,8 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					closest_atack.position.y -= 500
 					closest_zombie_to_human.get_child(0).play("default")	
 					break
+					
+			moving = false
 		else:
 			zombie_attack_ai(target_human, closest_zombie_to_human)
 
@@ -932,7 +935,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
 	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
-	moving = false	
 	check_humans_dead()	
 			
 func show_zombie_movement_range():
@@ -1593,7 +1595,7 @@ func check_humans_dead():
 		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
 		get_tree().reload_current_scene()
-
+		
 func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
 	var _a = get_node("../TileMap").local_to_map(a)
