@@ -219,7 +219,9 @@ func _input(event):
 							await get_tree().create_timer(0.5).timeout	
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 							
+							all_units[h].remove_from_group("zombies") 	
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()															
 
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -234,7 +236,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 																				
-
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+							
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -248,7 +252,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
-						
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+													
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -262,7 +268,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 							
-						
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+													
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()
 						
@@ -325,7 +333,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
-
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+							
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -339,7 +349,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 																				
-
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+							
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -353,7 +365,9 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 		
-													
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
+																				
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -367,6 +381,8 @@ func _input(event):
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
+							soundstream.stream = soundstream.map_sfx[5]
+							soundstream.play()		
 						
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()	
@@ -399,6 +415,9 @@ func _input(event):
 								cpu_units[i].add_to_group("dead") 
 								cpu_units[i].remove_from_group("zombies") 
 								moving = false
+
+								soundstream.stream = soundstream.map_sfx[5]
+								soundstream.play()										
 								
 						get_node("../Arrow").hide()
 						get_node("../Arrow2").hide()		
@@ -670,10 +689,17 @@ func _input(event):
 										user_units[selected_unit_num].scale.x = -1						
 					
 									user_units[selected_unit_num].get_child(0).play("attack")
+									soundstream.stream = soundstream.map_sfx[6]
+									soundstream.play()		
+																		
 									var tween: Tween = create_tween()
-									tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)			
+									tween.tween_property(cpu_units[j], "modulate:v", 1, 0.50).from(5)												
 									await get_tree().create_timer(1).timeout
 									cpu_units[j].get_child(0).play("death")
+									
+									soundstream.stream = soundstream.map_sfx[5]
+									soundstream.play()										
+									
 									await get_tree().create_timer(1).timeout
 									user_units[selected_unit_num].get_child(0).play("default")	
 									cpu_units[j].position.y -= 500
@@ -970,9 +996,17 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 
 					closest_zombie_to_human.get_child(0).play("attack")
 					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)			
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
+					
+					soundstream.stream = soundstream.map_sfx[4]
+					soundstream.play()							
+						
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
+					
+					soundstream.stream = soundstream.map_sfx[5]
+					soundstream.play()		
+									
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("humans dead")
 					closest_atack.position.y -= 500
