@@ -23,6 +23,8 @@ var rng = RandomNumberGenerator.new()
 
 @onready var laser = $"../Laser"
 
+@onready var soundstream = $"../SoundStream"
+
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 
 var astar_grid = AStarGrid2D.new()
@@ -189,6 +191,9 @@ func _input(event):
 												
 						right_clicked_unit.get_child(0).play("attack")	
 						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")		
 						
@@ -259,7 +264,8 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 							
 						
 						get_node("../Arrow").hide()
-						get_node("../Arrow2").hide()	
+						get_node("../Arrow2").hide()
+						
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
@@ -286,6 +292,9 @@ func _input(event):
 												
 						right_clicked_unit.get_child(0).play("attack")	
 						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")		
 						
@@ -372,6 +381,14 @@ func _input(event):
 
 					#Projectile drop
 					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog" and left_clicked_unit.unit_name != "Butch" and left_clicked_unit.unit_name != "Robodog":
+						right_clicked_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")							
+						
 						var tile_position = map_to_local(Vector2i(tile_pos)) + Vector2(0,0) / 2
 						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y-16))
 						for i in cpu_units.size():
@@ -436,7 +453,11 @@ func _input(event):
 								landmines = get_tree().get_nodes_in_group("mines")
 								all_landmines.append_array(landmines)			
 								
-								landmine_temp = landmine_instance								
+								landmine_temp = landmine_instance		
+								
+								soundstream.stream = soundstream.map_sfx[0]
+								soundstream.play()			
+											
 								await get_tree().create_timer(0.25).timeout	
 								
 							if landmine_temp:
@@ -463,7 +484,14 @@ func _input(event):
 						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_position.x:
 							right_clicked_unit.scale.x = -1																																					
 												
+						right_clicked_unit.get_child(0).play("attack")	
 						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						right_clicked_unit.get_child(0).play("default")	
+												
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")		
 						
@@ -613,7 +641,10 @@ func _input(event):
 							var unit_pos_2 = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos_2.x + unit_pos_2.y			
 							await get_tree().create_timer(0.25).timeout	
-										
+						
+						soundstream.stream = soundstream.map_sfx[0]
+						soundstream.play()		
+								
 					# Remove hover cells
 					for h in patharray.size():
 						set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)				
@@ -719,94 +750,98 @@ func _input(event):
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)	
 				
 		if event.button_index == MOUSE_BUTTON_RIGHT and moving == false:	
-			hovertile.show()			
-			#Remove hover tiles										
-			for j in grid_height:
-				for k in grid_width:
-					set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-																			
-			var mouse_pos = get_global_mouse_position()
-			mouse_pos.y += 8
-			var tile_pos = local_to_map(mouse_pos)		
-			var tile_data = get_cell_tile_data(0, tile_pos)
+			if event.pressed:			
+				hovertile.show()			
+				#Remove hover tiles										
+				for j in grid_height:
+					for k in grid_width:
+						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+																				
+				var mouse_pos = get_global_mouse_position()
+				mouse_pos.y += 8
+				var tile_pos = local_to_map(mouse_pos)		
+				var tile_data = get_cell_tile_data(0, tile_pos)
 
-			for i in user_units.size():
-				if user_units[i].tile_pos == tile_pos:
-					selected_unit_num = user_units[i].unit_num
-					selected_pos = user_units[i].tile_pos								
-					break
-
-			if tile_data is TileData:				
 				for i in user_units.size():
-					var unit_pos = local_to_map(user_units[i].position)
+					if user_units[i].tile_pos == tile_pos:
+						selected_unit_num = user_units[i].unit_num
+						selected_pos = user_units[i].tile_pos								
+						break
 
-					if unit_pos == tile_pos and user_units[i].unit_name != "Snake":							
-						attack_range = true
-						landmines_range = false
-						right_clicked_unit = user_units[i]
+				if tile_data is TileData:				
+					for i in user_units.size():
+						var unit_pos = local_to_map(user_units[i].position)
 
-						if user_units[i].unit_type == "Dog":
-							dog_range = true
+						if unit_pos == tile_pos and user_units[i].unit_name != "Snake":							
+							attack_range = true
+							landmines_range = false
+							right_clicked_unit = user_units[i]
 
-						if user_units[i].kill_count >= 2 and user_units[i].unit_type == "Dog":
-							return
-													
-						var hoverflag_1 = true															
-						for j in 16:	
-							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-							if hoverflag_1 == true:
-								for k in node2D.structures.size():
-									if tile_pos.x-j >= 0:	
-										set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
-										if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
-											hoverflag_1 = false
-											break	
-								
-						var hoverflag_2 = true										
-						for j in 16:	
-							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-							if hoverflag_2 == true:											
-								for k in node2D.structures.size():																						
-									if tile_pos.y+j <= 16:
-										set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
-										if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
-											hoverflag_2 = false
-											break
+							if user_units[i].unit_type == "Dog":
+								dog_range = true
 
-						var hoverflag_3 = true	
-						for j in 16:	
-							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-							if hoverflag_3 == true:											
-								for k in node2D.structures.size():																													
-									if tile_pos.x+j <= 16:
-										set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
-										if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
-											hoverflag_3 = false
-											break
+							if user_units[i].kill_count >= 2 and user_units[i].unit_type == "Dog":
+								return
+														
+							var hoverflag_1 = true															
+							for j in 16:	
+								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+								if hoverflag_1 == true:
+									for k in node2D.structures.size():
+										if tile_pos.x-j >= 0:	
+											set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
+											if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
+												hoverflag_1 = false
+												break	
+									
+							var hoverflag_2 = true										
+							for j in 16:	
+								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+								if hoverflag_2 == true:											
+									for k in node2D.structures.size():																						
+										if tile_pos.y+j <= 16:
+											set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
+											if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
+												hoverflag_2 = false
+												break
 
-						var hoverflag_4 = true	
-						for j in 16:	
-							set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-							if hoverflag_4 == true:											
-								for k in node2D.structures.size():																											
-									if tile_pos.y-j >= 0:									
-										set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
-										if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
-											hoverflag_4 = false
-											break
-					
-					if unit_pos == tile_pos and user_units[i].unit_name == "Snake":
-						right_clicked_unit = user_units[i]						
-						show_rambo_attack_range()
-					
-			if tile_pos.x == 0:
-				set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
-			if tile_pos.y == 0:
-				set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
-			if tile_pos.x == 15:
-				set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
-			if tile_pos.y == 15:
-				set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
+							var hoverflag_3 = true	
+							for j in 16:	
+								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+								if hoverflag_3 == true:											
+									for k in node2D.structures.size():																													
+										if tile_pos.x+j <= 16:
+											set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
+											if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
+												hoverflag_3 = false
+												break
+
+							var hoverflag_4 = true	
+							for j in 16:	
+								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+								if hoverflag_4 == true:											
+									for k in node2D.structures.size():																											
+										if tile_pos.y-j >= 0:									
+											set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
+											if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
+												hoverflag_4 = false
+												break
+						
+						if unit_pos == tile_pos and user_units[i].unit_name == "Snake":
+							right_clicked_unit = user_units[i]						
+							show_rambo_attack_range()
+						
+				if tile_pos.x == 0:
+					set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+				if tile_pos.y == 0:
+					set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+				if tile_pos.x == 15:
+					set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+				if tile_pos.y == 15:
+					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
+
+				soundstream.stream = soundstream.map_sfx[2]
+				soundstream.play()				
 
 func _on_zombie():	
 	zombie_button.hide()
@@ -906,6 +941,9 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 							
 				if h == closest_zombie_to_human.unit_movement:
 					break
+				
+				soundstream.stream = soundstream.map_sfx[0]
+				soundstream.play()						
 					
 			moving = false
 							
@@ -1108,6 +1146,9 @@ func show_zombie_movement_range():
 	clicked_zombie = true
 	attacks_container.hide()
 	
+	soundstream.stream = soundstream.map_sfx[1]
+	soundstream.play()		
+	
 func show_humans_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1260,6 +1301,9 @@ func show_humans_movement_range():
 	mines_button.show()
 	dog_mines_button.hide()	
 
+	soundstream.stream = soundstream.map_sfx[1]
+	soundstream.play()		
+	
 func show_rambo_attack_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1409,7 +1453,10 @@ func show_rambo_attack_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 48, Vector2i(0, 0), 0)				
 	
 	attacks_container.show()
-
+	
+	soundstream.stream = soundstream.map_sfx[1]
+	soundstream.play()		
+	
 func show_laser_range():
 	hovertile.show()			
 	#Remove hover tiles										
@@ -1484,6 +1531,9 @@ func show_laser_range():
 			set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
 		if tile_pos.y == 15:
 			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
+
+	soundstream.stream = soundstream.map_sfx[2]
+	soundstream.play()			
 
 func show_humans_landmine_range():				
 	#Remove hover tiles										
@@ -1561,7 +1611,10 @@ func show_humans_landmine_range():
 	
 	landmines_range = true
 	attack_range = false
-		
+	
+	soundstream.stream = soundstream.map_sfx[2]
+	soundstream.play()		
+			
 func show_dog_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1591,6 +1644,9 @@ func show_dog_movement_range():
 	attacks_container.show()	
 	mines_button.hide()
 	dog_mines_button.show()			
+
+	soundstream.stream = soundstream.map_sfx[1]
+	soundstream.play()		
 		
 func on_tween_finished():			
 	_on_zombie()
