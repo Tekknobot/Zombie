@@ -709,6 +709,19 @@ func _input(event):
 									cpu_units[j].add_to_group("dead")
 									cpu_units[j].remove_from_group("zombies")
 						
+									if cpu_units[j].unit_status == "Radioactive" and user_units[selected_unit_num].unit_type != "Dog":
+										var tween2: Tween = create_tween()
+										tween2.tween_property(user_units[selected_unit_num], "modulate:v", 1, 0.50).from(5)												
+										soundstream.stream = soundstream.map_sfx[6]
+										soundstream.play()												
+										await get_tree().create_timer(1).timeout										
+										user_units[selected_unit_num].get_child(0).play("death_radioactive")	
+										user_units[selected_unit_num].add_to_group("humans dead")
+										soundstream.stream = soundstream.map_sfx[5]
+										soundstream.play()											
+										await get_tree().create_timer(1).timeout
+										user_units[selected_unit_num].position.y -= 500
+																
 									user_units[selected_unit_num].moved = true
 									user_units[selected_unit_num].kill_count += 1									
 									_on_zombie()
@@ -889,6 +902,8 @@ func _on_zombie():
 	moving = false		
 	
 	humans = get_tree().get_nodes_in_group("humans")
+	if humans.size() == 0:
+		return
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
@@ -1058,7 +1073,8 @@ func zombie_attack_swarm():
 		return
 	
 	if closest_zombie_to_human.is_in_group("dead") or humans[target_human].is_in_group("humans dead"):
-		_on_zombie()
+		await zombie_attack_swarm()
+		return
 				
 	if !closest_zombie_to_human.is_in_group("dead") and !humans[target_human].is_in_group("humans dead"):
 		var closest_atack = humans[target_human]									

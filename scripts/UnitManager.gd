@@ -19,6 +19,7 @@ var tile_pos
 @export var unit_attack_range: int
 @export var unit_type: String
 @export var unit_num: int
+@export var unit_status: String
 @export var selected = false
 
 @onready var root = $"."
