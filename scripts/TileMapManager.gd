@@ -1051,7 +1051,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 
 func zombie_attack_swarm():
 	zombies = get_tree().get_nodes_in_group("zombies")
-	var target_human = rng.randi_range(0,1)
+	var target_human = rng.randi_range(0,humans.size()-1)
 	var closest_zombie_to_human = zombies[rng.randi_range(0,zombies.size()-1)]
 	
 	if !closest_zombie_to_human:		
@@ -1158,7 +1158,8 @@ func zombie_attack_swarm():
 					
 			moving = false
 		else:
-			zombie_attack_swarm()
+			await zombie_attack_swarm()
+			
 
 	get_node("../Arrow").show()
 	get_node("../Arrow").position = closest_zombie_to_human.position
