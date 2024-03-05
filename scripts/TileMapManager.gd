@@ -1159,6 +1159,7 @@ func zombie_attack_swarm():
 			moving = false
 		else:
 			await zombie_attack_swarm()
+			closest_zombie_to_human.get_child(0).play("default")	
 			
 
 	get_node("../Arrow").show()
