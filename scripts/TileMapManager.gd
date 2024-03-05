@@ -79,7 +79,8 @@ var swarming = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	if get_node("../SpawnManager").spawn_complete == true:
+		zombies = get_tree().get_nodes_in_group("zombies")
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
