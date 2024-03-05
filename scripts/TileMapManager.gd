@@ -915,6 +915,11 @@ func _on_zombie():
 	if swarm_turns == 3:
 		swarming = true
 		for i in 6:
+			zombies = get_tree().get_nodes_in_group("zombies")
+			if zombies.size() == 0:
+				moving = false
+				swarming = false
+				return			
 			soundstream.stream = soundstream.map_sfx[4] 
 			soundstream.play()
 			await zombie_attack_swarm()
