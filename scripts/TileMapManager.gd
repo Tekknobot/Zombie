@@ -77,6 +77,10 @@ var laser_b = Vector2(0,0)
 var swarm_turns = 0
 var swarming = false
 
+var random = []
+var index_num = 0
+var random_once = true
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if get_node("../SpawnManager").spawn_complete == true:
@@ -928,19 +932,24 @@ func _on_zombie():
 	
 	swarm_turns += 1
 	
+	zombies = get_tree().get_nodes_in_group("zombies")
+	
 	if swarm_turns == 3:
 		swarming = true
-		for i in 6:
+		for i in zombies.size():
 			zombies = get_tree().get_nodes_in_group("zombies")
 			if zombies.size() == 0:
 				moving = false
 				swarming = false
 				return			
 			soundstream.stream = soundstream.map_sfx[4] 
-			soundstream.play()
+			soundstream.play()		
 			await zombie_attack_swarm()
+			
 		swarm_turns = 0	
+		index_num = 0
 		swarming = false
+		random_once = false
 	else:
 		await zombie_attack_ai(target_human, closest_zombie_to_human)
 							
@@ -1067,15 +1076,30 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 
 func zombie_attack_swarm():
 	zombies = get_tree().get_nodes_in_group("zombies")
+	if zombies.size() == 0:
+		moving = false
+		swarming = false	
+		index_num = 0	
+		return	
+	
+	if random_once:		
+		random_once = false
+		random.clear()
+		random = get_random_numbers(0, zombies.size())	
+					
 	var target_human = rng.randi_range(0,humans.size()-1)
-	var closest_zombie_to_human = zombies[rng.randi_range(0,zombies.size()-1)]
+	var closest_zombie_to_human = zombies[random[index_num]]
+	index_num += 1
 	
+	if index_num == random.size():
+		index_num = 0
+
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
-	
 	if dead_humans.size() == 2:
 		moving = false
-		swarming = false		
-		return
+		swarming = false	
+		index_num = 0	
+		return		
 	
 	if !closest_zombie_to_human:		
 		return
@@ -1181,6 +1205,13 @@ func zombie_attack_swarm():
 					break
 					
 			moving = false
+			
+			dead_humans = get_tree().get_nodes_in_group("humans dead")
+			if dead_humans.size() == 2:
+				moving = false
+				swarming = false
+				index_num = 0		
+				return			
 		else:
 			await zombie_attack_swarm()
 			closest_zombie_to_human.get_child(0).play("default")	
@@ -1910,3 +1941,10 @@ func _on_next_button_pressed():
 
 func _on_laser_button_pressed():
 	show_laser_range()	
+
+func get_random_numbers(from, to):
+	var arr = []
+	for i in range(from,to):
+		arr.append(i)
+	arr.shuffle()
+	return arr	
