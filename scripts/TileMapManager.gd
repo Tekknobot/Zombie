@@ -78,7 +78,6 @@ var swarm_turns = 0
 var swarming = false
 
 var random = []
-var index_num = 0
 var random_once = true
 
 # Called when the node enters the scene tree for the first time.
@@ -947,7 +946,6 @@ func _on_zombie():
 			await zombie_attack_swarm()
 			
 		swarm_turns = 0	
-		index_num = 0
 		swarming = false
 		random_once = false
 	else:
@@ -1078,27 +1076,16 @@ func zombie_attack_swarm():
 	zombies = get_tree().get_nodes_in_group("zombies")
 	if zombies.size() == 0:
 		moving = false
-		swarming = false	
-		index_num = 0	
+		swarming = false		
 		return	
-	
-	if random_once:		
-		random_once = false
-		random.clear()
-		random = get_random_numbers(0, zombies.size())	
 					
 	var target_human = rng.randi_range(0,humans.size()-1)
-	var closest_zombie_to_human = zombies[random[index_num]]
-	index_num += 1
-	
-	if index_num == random.size():
-		index_num = 0
+	var closest_zombie_to_human = zombies[rng.randi_range(0,zombies.size()-1)]
 
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
 	if dead_humans.size() == 2:
 		moving = false
 		swarming = false	
-		index_num = 0	
 		return		
 	
 	if !closest_zombie_to_human:		
@@ -1209,8 +1196,7 @@ func zombie_attack_swarm():
 			dead_humans = get_tree().get_nodes_in_group("humans dead")
 			if dead_humans.size() == 2:
 				moving = false
-				swarming = false
-				index_num = 0		
+				swarming = false	
 				return			
 		else:
 			await zombie_attack_swarm()
