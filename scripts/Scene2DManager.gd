@@ -247,11 +247,11 @@ func environment_tiles():
 	if moon == true:
 		tile_random_id = rng.randi_range(14, 16)
 	if mars == true:
-		var tile_random_id = rng.randi_range(21, 23)
+		tile_random_id = rng.randi_range(21, 23)
 	if saturn == true:
 		tile_random_id = rng.randi_range(27, 29)
 	if venus == true:
-		tile_random_id = rng.randi_range(34, 36)
+		tile_random_id = rng.randi_range(33, 35)
 
 	# Tiles
 	for h in structures_blank.size():
