@@ -79,6 +79,7 @@ var swarming = false
 
 var random = []
 var random_once = true
+var index = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -944,7 +945,7 @@ func _on_zombie():
 			soundstream.stream = soundstream.map_sfx[4] 
 			soundstream.play()		
 			await zombie_attack_swarm()
-			
+		index = 0	
 		swarm_turns = 0	
 		swarming = false
 		random_once = false
@@ -1080,7 +1081,11 @@ func zombie_attack_swarm():
 		return	
 					
 	var target_human = rng.randi_range(0,humans.size()-1)
-	var closest_zombie_to_human = zombies[rng.randi_range(0,zombies.size()-1)]
+	var closest_zombie_to_human = zombies[index]
+	index += 1
+	
+	if index == cpu_units.size():
+		index = 0
 
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
 	if dead_humans.size() == 2:
