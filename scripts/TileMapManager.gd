@@ -1084,7 +1084,7 @@ func zombie_attack_swarm():
 	var closest_zombie_to_human = zombies[index]
 	index += 1
 	
-	if index == cpu_units.size():
+	if index == zombies.size():
 		index = 0
 
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
