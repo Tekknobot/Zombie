@@ -6,7 +6,7 @@ var rng = RandomNumberGenerator.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var num = rng.randi_range(0,1)
+	var num = rng.randi_range(0,2)
 	self.stream = self.map_music[num]
 	self.play()	
 
