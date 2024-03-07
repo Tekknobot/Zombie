@@ -641,14 +641,6 @@ func _input(event):
 									var unit_pos_new = local_to_map(user_units[selected_unit_num].position)
 									user_units[selected_unit_num].z_index = unit_pos_new.x + unit_pos_new.y								
 									path_interupted = true
-									#var explosion = preload("res://scenes/vfx/explosion.scn")
-									#var explosion_instance = explosion.instantiate()
-									#var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
-									#explosion_instance.set_name("explosion")
-									#get_parent().add_child(explosion_instance)
-									#explosion_instance.position = explosion_position	
-									#explosion_instance.position.y -= 16
-									#explosion_instance.z_index = (mine_pos.x + mine_pos.y) + 1
 									var tween = create_tween()
 									tween.tween_property(user_units[selected_unit_num], "position", tile_center_position_new, 0.25)									
 									tween.connect("finished", on_tween_finished)
@@ -1531,7 +1523,7 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 	
-	#attacks_container.show()
+	attacks_container.hide()
 	mines_button.show()
 	dog_mines_button.hide()	
 
@@ -1686,7 +1678,7 @@ func show_rambo_attack_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 48, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 48, Vector2i(0, 0), 0)				
 	
-	attacks_container.show()
+	attacks_container.hide()
 	
 	soundstream.stream = soundstream.map_sfx[1]
 	soundstream.play()		
