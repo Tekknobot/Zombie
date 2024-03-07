@@ -1903,6 +1903,7 @@ func check_humans_dead():
 		get_node("../Arrow").modulate.a = 0
 		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
+		await get_tree().create_timer(3).timeout
 		get_tree().reload_current_scene()
 		
 func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
