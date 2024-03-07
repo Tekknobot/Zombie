@@ -937,7 +937,6 @@ func _on_zombie():
 	if swarm_turns == 3:
 		swarming = true
 		for i in zombies.size():
-			zombies = get_tree().get_nodes_in_group("zombies")
 			if zombies.size() == 0:
 				moving = false
 				swarming = false
@@ -1091,6 +1090,7 @@ func zombie_attack_swarm():
 	if dead_humans.size() == 2:
 		moving = false
 		swarming = false	
+		check_humans_dead()
 		return		
 	
 	if !closest_zombie_to_human:		
