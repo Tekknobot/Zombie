@@ -199,7 +199,7 @@ func _input(event):
 												
 						right_clicked_unit.get_child(0).play("attack")	
 						
-						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.stream = soundstream.map_sfx[7]
 						soundstream.play()	
 												
 						await get_tree().create_timer(0.1).timeout
@@ -407,7 +407,7 @@ func _input(event):
 					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog" and left_clicked_unit.unit_name != "Butch" and left_clicked_unit.unit_name != "Robodog":
 						right_clicked_unit.get_child(0).play("attack")	
 						
-						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.stream = soundstream.map_sfx[7]
 						soundstream.play()	
 												
 						await get_tree().create_timer(0.1).timeout
@@ -1055,7 +1055,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
 					
-					soundstream.stream = soundstream.map_sfx[5]
+					soundstream.stream = soundstream.map_sfx[8]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
@@ -1195,7 +1195,7 @@ func zombie_attack_swarm():
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
 					
-					soundstream.stream = soundstream.map_sfx[5]
+					soundstream.stream = soundstream.map_sfx[8]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
