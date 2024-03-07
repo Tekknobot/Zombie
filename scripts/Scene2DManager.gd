@@ -538,8 +538,7 @@ func select_biome():
 	if biome == 5:	
 		night = true	
 		generate_world()
-			
-											
+												
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
 	
