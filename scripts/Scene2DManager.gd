@@ -56,6 +56,7 @@ var mars = false
 var moon = false
 var saturn = false
 var venus = false
+var night = false
 
 var tile_num = 1
 var my_odd_x: int
@@ -118,7 +119,10 @@ func generate_world():
 		tilelist = [31, 30, 25, 27, 28, 29]
 	if venus == true:	
 		tilelist = [36, 37, 32, 34, 35, 36]
-				
+	if night == true:	
+		tilelist = [49, 50, 51, 52, 53, 54]
+		
+						
 	#var rng = RandomNumberGenerator.new()
 	fastNoiseLite.seed = rng.randi_range(0, 256)
 	fastNoiseLite.TYPE_PERLIN
@@ -252,6 +256,8 @@ func environment_tiles():
 		tile_random_id = rng.randi_range(27, 29)
 	if venus == true:
 		tile_random_id = rng.randi_range(33, 35)
+	if night == true:
+		tile_random_id = rng.randi_range(52, 54)
 
 	# Tiles
 	for h in structures_blank.size():
@@ -508,7 +514,7 @@ func check_duplicates(a):
 				Map.astar_grid.set_point_solid(j_pos, true)				
 
 func select_biome():	
-	biome = rng.randi_range(0, 4)	
+	biome = rng.randi_range(0, 5)	
 	if biome == 0:
 		world = true		
 		generate_world()
@@ -528,6 +534,11 @@ func select_biome():
 	if biome == 4:	
 		venus = true	
 		generate_world()
+
+	if biome == 5:	
+		night = true	
+		generate_world()
+			
 											
 func _on_reset_button_pressed():
 	get_tree().reload_current_scene()
