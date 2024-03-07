@@ -912,6 +912,14 @@ func _on_zombie():
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
+	
+	var dead_humans = get_tree().get_nodes_in_group("humans dead")
+	if dead_humans.size() == 2:
+		moving = false
+		swarming = false	
+		check_humans_dead()
+		return	
+			
 	if closest_zombie_to_human == null:
 		return
 	if !humans[target_human].is_in_group("humans dead") and !closest_zombie_to_human.is_in_group("dead"):
@@ -1073,6 +1081,13 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	check_humans_dead()	
 
 func zombie_attack_swarm():
+	var dead_humans = get_tree().get_nodes_in_group("humans dead")
+	if dead_humans.size() == 2:
+		moving = false
+		swarming = false	
+		check_humans_dead()
+		return		
+			
 	zombies = get_tree().get_nodes_in_group("zombies")
 	if zombies.size() == 0:
 		moving = false
@@ -1085,13 +1100,6 @@ func zombie_attack_swarm():
 	
 	if index == zombies.size():
 		index = 0
-
-	var dead_humans = get_tree().get_nodes_in_group("humans dead")
-	if dead_humans.size() == 2:
-		moving = false
-		swarming = false	
-		check_humans_dead()
-		return		
 	
 	if !closest_zombie_to_human:		
 		return
