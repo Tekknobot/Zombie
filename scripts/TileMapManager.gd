@@ -24,6 +24,7 @@ var rng = RandomNumberGenerator.new()
 @onready var laser = $"../Laser"
 
 @onready var soundstream = $"../SoundStream"
+@onready var musicstream = $"../MapMusicStream"
 
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 
@@ -1903,7 +1904,11 @@ func check_humans_dead():
 		get_node("../Arrow").modulate.a = 0
 		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
-		await get_tree().create_timer(3).timeout
+
+		soundstream.stream = soundstream.map_sfx[9]
+		soundstream.play()		
+		musicstream.stop()	
+		await get_tree().create_timer(1).timeout
 		get_tree().reload_current_scene()
 		
 func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
