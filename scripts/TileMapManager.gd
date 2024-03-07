@@ -722,7 +722,7 @@ func _input(event):
 										await get_tree().create_timer(1).timeout										
 										user_units[selected_unit_num].get_child(0).play("death_radioactive")	
 										user_units[selected_unit_num].add_to_group("humans dead")
-										soundstream.stream = soundstream.map_sfx[5]
+										soundstream.stream = soundstream.map_sfx[8]
 										soundstream.play()											
 										await get_tree().create_timer(1).timeout
 										user_units[selected_unit_num].position.y -= 500
