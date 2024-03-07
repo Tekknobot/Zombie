@@ -1530,7 +1530,7 @@ func show_humans_movement_range():
 					set_cell(1, Vector2i(unit_pos.x+3, unit_pos.y-2), 10, Vector2i(0, 0), 0)																																								
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 10, Vector2i(0, 0), 0)				
 	
-	attacks_container.show()
+	#attacks_container.show()
 	mines_button.show()
 	dog_mines_button.hide()	
 
