@@ -1095,7 +1095,7 @@ func zombie_attack_swarm():
 		swarming = false		
 		return	
 
-	if index == zombies.size():
+	if index >= zombies.size():
 		index = 0
 							
 	var target_human = rng.randi_range(0,humans.size()-1)
