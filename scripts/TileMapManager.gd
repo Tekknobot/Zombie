@@ -1094,14 +1094,14 @@ func zombie_attack_swarm():
 		moving = false
 		swarming = false		
 		return	
-					
+
+	if index == zombies.size():
+		index = 0
+							
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var closest_zombie_to_human = zombies[index]
 	index += 1
-	
-	if index == zombies.size():
-		index = 0
-	
+		
 	if !closest_zombie_to_human:		
 		return
 	
