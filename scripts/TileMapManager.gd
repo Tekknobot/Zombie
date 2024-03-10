@@ -788,7 +788,7 @@ func _input(event):
 								for m in grid_height:
 									for n in grid_width:
 										set_cell(1, Vector2i(m,n), -1, Vector2i(0, 0), 0)	
-				
+			
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false and swarming == false:	
 			if event.pressed:			
 				hovertile.show()			
