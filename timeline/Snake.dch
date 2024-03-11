@@ -8,22 +8,12 @@
 "sound_moods": {},
 "style": ""
 },
-"default_portrait": "Snake",
+"default_portrait": "",
 "description": "",
-"display_name": "Snake",
+"display_name": "",
 "mirror": false,
 "nicknames": [""],
 "offset": Vector2(0, 0),
-"portraits": {
-"Snake": {
-"export_overrides": {
-"image": "\"res://timeline/portraits/Snake.png\""
-},
-"mirror": false,
-"offset": Vector2(0, 0),
-"scale": 1,
-"scene": ""
-}
-},
+"portraits": {},
 "scale": 1.0
 }
