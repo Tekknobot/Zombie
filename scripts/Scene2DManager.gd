@@ -460,7 +460,6 @@ func spawn_towers_final():
 				
 	towers = get_tree().get_nodes_in_group("towers")
 	structures.append_array(towers)
-	spawn_button.show()
 	add_to_structures_array()
 							
 func add_to_structures_array():

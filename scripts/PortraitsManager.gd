@@ -10,6 +10,7 @@ var rng = RandomNumberGenerator.new()
 var soldier = preload("res://assets/portraits/soldier_port.png")
 var zombie = preload("res://assets/portraits/zombie_port.png")
 var dog = preload("res://assets/portraits/dog_port.png")
+var rambo = preload("res://assets/portraits/Zombies/Rambo_portrait.png")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,11 +20,7 @@ func _ready():
 func _process(delta):
 	pass
 
-func _input(event):
-	if event is InputEventKey:	
-		if event.pressed and event.keycode == KEY_ESCAPE:
-			get_tree().quit()
-				
+func _input(event):			
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:	
 			if event.pressed:
@@ -40,3 +37,5 @@ func _input(event):
 						Portrait.texture = soldier
 					if Map.all_units[i].unit_type == "Dog" and Map.all_units[i].tile_pos == tile_pos:	
 						Portrait.texture = dog		
+					if Map.all_units[i].unit_name == "Snake" and Map.all_units[i].tile_pos == tile_pos:	
+						Portrait.texture = rambo		

@@ -25,10 +25,7 @@ func _ready():
 func _process(delta):
 	pass
 
-func spawn():
-	spawn_button.hide()
-	#zombie_button.show()
-	
+func spawn():	
 	await get_tree().create_timer(1).timeout
 	
 	# Find open tiles

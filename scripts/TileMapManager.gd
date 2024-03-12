@@ -7,7 +7,6 @@ var grid_height = 16
 var rng = RandomNumberGenerator.new()
 
 @export var hovertile: Sprite2D
-@export var zombie_button: Button
 @export var node2D: Node2D
 @export var attacks_container: HBoxContainer
 
@@ -16,8 +15,8 @@ var rng = RandomNumberGenerator.new()
 @onready var pre_b = $"../preB"
 @onready var sprite_2d = $"../Sprite2D"
 
-@onready var next_button = $"../Control/MenuContainer/NextButton"
-@onready var reset_button = $"../Control/MenuContainer/ResetButton"
+@onready var next_button = $"../Control/MainContainer/NextButton"
+@onready var reset_button = $"../Control/MainContainer/ResetButton"
 @onready var mines_button = $"../Control/AttacksContainer/LandmineButton"
 @onready var dog_mines_button = $"../Control/AttacksContainer/DogmineButton"
 
@@ -76,6 +75,7 @@ var laser_a = Vector2(0,0)
 var laser_b = Vector2(0,0)
 
 var swarm_turns = 0
+var before_swarm_total = 6
 var swarming = false
 
 var random = []
@@ -440,8 +440,11 @@ func _input(event):
 						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
 							if dead_humans.size() == 2:					
 								return
-									
-							check_zombies_dead()
+								
+							dead_zombies = get_tree().get_nodes_in_group("dead")		
+							if dead_zombies.size() == cpu_units.size():
+								await check_zombies_dead()
+								return
 							
 							if map_cleared == true:
 								return
@@ -602,8 +605,11 @@ func _input(event):
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
 					if dead_humans.size() == 2:					
 						return
-							
-					check_zombies_dead()
+					
+					dead_zombies = get_tree().get_nodes_in_group("dead")		
+					if dead_zombies.size() == cpu_units.size():
+						await check_zombies_dead()
+						return
 					
 					if map_cleared == true:
 						return
@@ -884,7 +890,6 @@ func _input(event):
 				soundstream.play()				
 
 func _on_zombie():	
-	zombie_button.hide()
 	landmine_once = true
 	
 	for i in user_units.size():
@@ -935,7 +940,7 @@ func _on_zombie():
 	
 	zombies = get_tree().get_nodes_in_group("zombies")
 	
-	if swarm_turns == 3:
+	if swarm_turns == before_swarm_total:
 		swarming = true
 		for i in zombies.size():
 			if zombies.size() == 0:
@@ -1887,7 +1892,8 @@ func check_zombies_dead():
 		reset_button.hide()
 		await get_tree().create_timer(0).timeout
 		get_node("../Arrow").modulate.a = 0
-		get_node("../Arrow2").modulate.a = 0			
+		get_node("../Arrow2").modulate.a = 0
+					
 
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
