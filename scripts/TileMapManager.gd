@@ -603,7 +603,7 @@ func _input(event):
 						
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 10 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true and clicked_zombie == false:
-					if dead_humans.size() == 2:					
+					if dead_humans.size() == 1:					
 						return
 					
 					dead_zombies = get_tree().get_nodes_in_group("dead")		
@@ -912,7 +912,7 @@ func _on_zombie():
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
 	
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
-	if dead_humans.size() == 2:
+	if dead_humans.size() == 1:
 		moving = false
 		swarming = false	
 		check_humans_dead()
@@ -1080,7 +1080,7 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 
 func zombie_attack_swarm():
 	var dead_humans = get_tree().get_nodes_in_group("humans dead")
-	if dead_humans.size() == 2:
+	if dead_humans.size() == 1:
 		moving = false
 		swarming = false	
 		check_humans_dead()
@@ -1205,7 +1205,7 @@ func zombie_attack_swarm():
 			moving = false
 			
 			dead_humans = get_tree().get_nodes_in_group("humans dead")
-			if dead_humans.size() == 2:
+			if dead_humans.size() == 1:
 				moving = false
 				swarming = false	
 				return			
@@ -1898,7 +1898,7 @@ func check_zombies_dead():
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
 			
-	if dead_humans.size() == 2:
+	if dead_humans.size() == 1:
 		get_node("../Arrow").modulate.a = 0
 		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
