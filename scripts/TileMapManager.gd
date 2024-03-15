@@ -75,7 +75,7 @@ var laser_a = Vector2(0,0)
 var laser_b = Vector2(0,0)
 
 var swarm_turns = 0
-var before_swarm_total = 6
+var before_swarm_total = 4
 var swarming = false
 
 var random = []
