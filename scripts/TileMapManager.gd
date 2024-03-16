@@ -438,7 +438,7 @@ func _input(event):
 						dogmine_range = false
 						#Move unit
 						if astar_grid.is_point_solid(tile_pos) == false and clicked_zombie == false:
-							if dead_humans.size() == 2:					
+							if dead_humans.size() == 1:					
 								return
 								
 							dead_zombies = get_tree().get_nodes_in_group("dead")		
