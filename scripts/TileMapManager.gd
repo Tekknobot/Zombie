@@ -1020,6 +1020,7 @@ func zombie_attack_swarm():
 		moving = false
 		swarming = false	
 		check_humans_dead()	
+		return
 			
 	zombies = get_tree().get_nodes_in_group("zombies")
 	if zombies.size() == 0:
