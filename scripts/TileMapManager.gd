@@ -287,7 +287,7 @@ func _input(event):
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
 
-					#Dog orbital laser
+					#Dog Orbital laser
 					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and right_clicked_unit.unit_name == "Robodog":
 						
 						if right_clicked_unit.unit_team == 1:
@@ -688,8 +688,8 @@ func _input(event):
 										user_units[selected_unit_num].position.y -= 500
 																
 									user_units[selected_unit_num].moved = true
-									user_units[selected_unit_num].kill_count += 1									
-									_on_zombie()
+									user_units[selected_unit_num].kill_count += 1
+									check_humans_dead()									
 									return
 									
 					_on_zombie()						
@@ -1744,7 +1744,7 @@ func check_humans_dead():
 		soundstream.play()		
 		musicstream.stop()	
 		await get_tree().create_timer(1).timeout
-		get_tree().reload_current_scene()
+		reload_scene()
 		
 func SetLinePoints(a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
@@ -1785,3 +1785,6 @@ func get_random_numbers(from, to):
 		arr.append(i)
 	arr.shuffle()
 	return arr	
+
+func reload_scene():
+	get_tree().reload_current_scene()	

@@ -122,8 +122,6 @@ func generate_world():
 	if night == true:	
 		tilelist = [49, 50, 51, 52, 53, 54]
 		
-						
-	#var rng = RandomNumberGenerator.new()
 	fastNoiseLite.seed = rng.randi_range(0, 256)
 	fastNoiseLite.TYPE_PERLIN
 	fastNoiseLite.fractal_octaves = tilelist.size()
