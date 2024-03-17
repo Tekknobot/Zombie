@@ -25,6 +25,8 @@ var rng = RandomNumberGenerator.new()
 @onready var soundstream = $"../SoundStream"
 @onready var musicstream = $"../MapMusicStream"
 
+@onready var gameover_prompt = $"../Control/GAMEOVER"
+
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 
 var astar_grid = AStarGrid2D.new()
@@ -51,6 +53,8 @@ var left_clicked_unit_position
 
 var only_once = true
 var only_once_zombie = true
+var run_once = true
+
 var attack_range = false
 var landmines_range = false
 var dogmine_range = false
@@ -689,7 +693,8 @@ func _input(event):
 																
 									user_units[selected_unit_num].moved = true
 									user_units[selected_unit_num].kill_count += 1
-									check_humans_dead()									
+									check_humans_dead()	
+									_on_zombie()								
 									return
 									
 					_on_zombie()						
@@ -1736,16 +1741,16 @@ func check_zombies_dead():
 		await get_tree().create_timer(0).timeout
 					
 func check_humans_dead():
-	dead_humans = get_tree().get_nodes_in_group("humans dead")
-			
-	if dead_humans.size() == 1:
+	dead_humans = get_tree().get_nodes_in_group("humans dead")		
+	if dead_humans.size() == 1 and run_once == true:
 		print("Zombies Win!")	
 		soundstream.stream = soundstream.map_sfx[9]
 		soundstream.play()		
 		musicstream.stop()	
 		await get_tree().create_timer(1).timeout
 		reload_scene()
-		
+		run_once = false
+			
 func SetLinePoints(a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
 	var _a = get_node("../TileMap").local_to_map(a)
@@ -1787,4 +1792,4 @@ func get_random_numbers(from, to):
 	return arr	
 
 func reload_scene():
-	get_tree().reload_current_scene()	
+	gameover_prompt.show()
