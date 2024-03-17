@@ -137,8 +137,6 @@ func _process(delta):
 			set_cell(1, Vector2i(h+16, i+16), -1, Vector2i(0, 0), 0)
 	
 	if get_node("../SpawnManager").spawn_complete == true and moving == true:
-		get_node("../Arrow").hide()
-		get_node("../Arrow2").hide()
 		hovertile.hide()				
 						
 func _input(event):
@@ -177,7 +175,7 @@ func _input(event):
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 					left_clicked_unit = all_units[h]
 					
-					#Projectile shoot	
+					#Butch Projectile shoot	
 					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == true and landmines_range == false and right_clicked_unit.unit_name == "Butch":
 						
 						if right_clicked_unit.unit_team == 1:
@@ -279,9 +277,6 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 							
 							soundstream.stream = soundstream.map_sfx[5]
 							soundstream.play()		
-													
-						get_node("../Arrow").hide()
-						get_node("../Arrow2").hide()
 						
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
@@ -322,9 +317,6 @@ func _input(event):
 						
 						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
 						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
-
-						get_node("../Arrow").hide()
-						get_node("../Arrow2").hide()
 							
 						await laser.draw_laser()
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
@@ -391,10 +383,7 @@ func _input(event):
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
 							soundstream.stream = soundstream.map_sfx[5]
-							soundstream.play()		
-						
-						get_node("../Arrow").hide()
-						get_node("../Arrow2").hide()	
+							soundstream.play()			
 
 						#Remove hover tiles										
 						for j in grid_height:
@@ -403,37 +392,8 @@ func _input(event):
 													
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
-
-					#Projectile drop
-					if clicked_center_pos == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Human" and right_clicked_unit.unit_name == "Snake" and user_units[selected_unit_num].unit_name != "Robodog" and left_clicked_unit.unit_name != "Butch" and left_clicked_unit.unit_name != "Robodog":
-						right_clicked_unit.get_child(0).play("attack")	
-						
-						soundstream.stream = soundstream.map_sfx[7]
-						soundstream.play()	
-												
-						await get_tree().create_timer(0.1).timeout
-						right_clicked_unit.get_child(0).play("default")							
-						
-						var tile_position = map_to_local(Vector2i(tile_pos)) + Vector2(0,0) / 2
-						await SetLinePoints(line_2d, Vector2(tile_position.x,tile_position.y-200), Vector2(tile_position.x,tile_position.y-16))
-						for i in cpu_units.size():
-							if cpu_units[i].tile_pos == clicked_pos:
-								cpu_units[i].get_child(0).play("death")
-								await get_tree().create_timer(0.5).timeout	
-								cpu_units[i].position.y -= 500		
-								cpu_units[i].add_to_group("dead") 
-								cpu_units[i].remove_from_group("zombies") 
-								moving = false
-
-								soundstream.stream = soundstream.map_sfx[5]
-								soundstream.play()										
-								
-						get_node("../Arrow").hide()
-						get_node("../Arrow2").hide()		
-						await get_tree().create_timer(1).timeout
-						_on_zombie()
-											
-					#Landmine run
+					
+					#Dog Landmine run
 					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake" and dogmine_range == true:
 						dogmine_range = false
 						#Move unit
@@ -499,8 +459,8 @@ func _input(event):
 								
 							_on_zombie()				
 							
-					#Place landmine
-					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_type == "Human" and landmines_range == true:
+					#Snake Place landmine
+					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Snake" and landmines_range == true:
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
@@ -522,13 +482,8 @@ func _input(event):
 												
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")	
-												
-						await get_tree().create_timer(0.1).timeout
-						right_clicked_unit.get_child(0).play("default")		
 						
 						var right_clicked_pos = local_to_map(right_clicked_unit.position)
-						
-						#get_node("../Camera2D").shake(0.5, 30, 3)
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_position.x:	
 							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -920,19 +875,6 @@ func _on_zombie():
 			
 	if closest_zombie_to_human == null:
 		return
-	if !humans[target_human].is_in_group("humans dead") and !closest_zombie_to_human.is_in_group("dead"):
-		get_node("../Arrow2").show()
-		get_node("../Arrow2").position = humans[target_human].position
-		var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
-		get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
-
-		get_node("../Arrow").show()
-		get_node("../Arrow").position = closest_zombie_to_human.position
-		var arrow_pos = local_to_map(get_node("../Arrow").position)
-		get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3	
-	else:		
-		_on_zombie()
-		return		
 	
 	moving = true
 	
@@ -974,7 +916,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1 and structure_interupterd == false: 
-			get_node("../Arrow").hide()
 			
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
@@ -1065,16 +1006,6 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 			moving = false
 		else:
 			zombie_attack_ai(target_human, closest_zombie_to_human)
-
-	get_node("../Arrow").show()
-	get_node("../Arrow").position = closest_zombie_to_human.position
-	var arrow_pos = local_to_map(get_node("../Arrow").position)
-	get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3		
-
-	get_node("../Arrow2").show()
-	get_node("../Arrow2").position = humans[target_human].position
-	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
-	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
 	check_humans_dead()	
 
@@ -1114,7 +1045,6 @@ func zombie_attack_swarm():
 		closest_zombie_to_human.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(zombie_surrounding_cells[open_tile]) == false and get_cell_source_id(0, zombie_surrounding_cells[open_tile]) != -1 and structure_interupterd == false: 
-			get_node("../Arrow").hide()
 			
 			var patharray = astar_grid.get_point_path(closest_zombie_to_human.tile_pos, zombie_surrounding_cells[open_tile])
 			# Find path and set hover cells
@@ -1212,17 +1142,6 @@ func zombie_attack_swarm():
 		else:
 			await zombie_attack_swarm()
 			closest_zombie_to_human.get_child(0).play("default")	
-			
-
-	get_node("../Arrow").show()
-	get_node("../Arrow").position = closest_zombie_to_human.position
-	var arrow_pos = local_to_map(get_node("../Arrow").position)
-	get_node("../Arrow").z_index = (arrow_pos.x + arrow_pos.y) + 3		
-
-	get_node("../Arrow2").show()
-	get_node("../Arrow2").position = humans[target_human].position
-	var arrow_pos2 = local_to_map(get_node("../Arrow2").position)
-	get_node("../Arrow2").z_index = (arrow_pos2.x + arrow_pos2.y) + 3	
 	
 	check_humans_dead()	
 			
@@ -1684,9 +1603,9 @@ func show_rambo_attack_range():
 					set_cell(1, Vector2i(unit_pos.x-2, unit_pos.y+3), 48, Vector2i(0, 0), 0)				
 	
 	attacks_container.hide()
-	
 	soundstream.stream = soundstream.map_sfx[1]
-	soundstream.play()		
+	soundstream.play()	
+	landmines_range = true	
 	
 func show_laser_range():
 	hovertile.show()			
@@ -1765,87 +1684,7 @@ func show_laser_range():
 
 	soundstream.stream = soundstream.map_sfx[2]
 	soundstream.play()			
-
-func show_humans_landmine_range():				
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-																	
-	var tile_pos = local_to_map(left_clicked_unit_position)		
-	var tile_data = get_cell_tile_data(0, tile_pos)
-
-	if tile_data is TileData:			
-		for i in user_units.size():
-			var unit_pos = local_to_map(user_units[i].position)
-
-			if unit_pos == tile_pos:
-				attack_range = true
-				right_clicked_unit = user_units[i]
-				
-				var hoverflag_1 = true															
-				for j in 2:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_1 == true:
-						for k in node2D.structures.size():
-							if tile_pos.x-j >= 0:	
-								set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x-j, tile_pos.y):
-									hoverflag_1 = false
-									set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), -1, Vector2i(0, 0), 0)	
-									break	
-						
-				var hoverflag_2 = true										
-				for j in 2:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_2 == true:											
-						for k in node2D.structures.size():																						
-							if tile_pos.y+j <= 16:
-								set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y+j):
-									hoverflag_2 = false
-									set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), -1, Vector2i(0, 0), 0)
-									break
-
-				var hoverflag_3 = true	
-				for j in 2:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_3 == true:											
-						for k in node2D.structures.size():																													
-							if tile_pos.x+j <= 16:
-								set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x+j, tile_pos.y):
-									hoverflag_3 = false
-									set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), -1, Vector2i(0, 0), 0)
-									break
-
-				var hoverflag_4 = true	
-				for j in 2:	
-					set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-					if hoverflag_4 == true:											
-						for k in node2D.structures.size():																											
-							if tile_pos.y-j >= 0:									
-								set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 48, Vector2i(0, 0), 0)
-								if node2D.structures[k].coord == Vector2i(tile_pos.x, tile_pos.y-j):
-									hoverflag_4 = false
-									set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), -1, Vector2i(0, 0), 0)
-									break
-	
-	if tile_pos.x == 0:
-		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
-	if tile_pos.y == 0:
-		set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
-	if tile_pos.x == 15:
-		set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
-	if tile_pos.y == 15:
-		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)		
-	
-	landmines_range = true
-	attack_range = false
-	
-	soundstream.stream = soundstream.map_sfx[2]
-	soundstream.play()		
-			
+		
 func show_dog_movement_range():
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1891,16 +1730,11 @@ func check_zombies_dead():
 		next_button.show()
 		reset_button.hide()
 		await get_tree().create_timer(0).timeout
-		get_node("../Arrow").modulate.a = 0
-		get_node("../Arrow2").modulate.a = 0
 					
-
 func check_humans_dead():
 	dead_humans = get_tree().get_nodes_in_group("humans dead")
 			
 	if dead_humans.size() == 1:
-		get_node("../Arrow").modulate.a = 0
-		get_node("../Arrow2").modulate.a = 0
 		print("Zombies Win!")	
 
 		soundstream.stream = soundstream.map_sfx[9]
@@ -1936,8 +1770,30 @@ func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 
-func _on_landmine_button_pressed():
-	show_humans_landmine_range()
+func SetLandPoints(line: Line2D, a: Vector2, b: Vector2):
+	var _a = get_node("../TileMap").local_to_map(a)
+	var _b = get_node("../TileMap").local_to_map(b)		
+	
+	get_node("../Seeker").position = a
+	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
+	var tween: Tween = create_tween()
+	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+	await get_tree().create_timer(1).timeout			
+
+	var explosion = preload("res://scenes/vfx/explosion.scn")
+	var explosion_instance = explosion.instantiate()
+	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
+	explosion_instance.set_name("explosion")
+	get_parent().add_child(explosion_instance)
+	explosion_instance.position = explosion_position	
+	explosion_instance.position.y -= 16
+	explosion_instance.z_index = (_b.x + _b.y) + 1
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+
 	
 func _on_next_button_pressed():
 	get_tree().reload_current_scene()
