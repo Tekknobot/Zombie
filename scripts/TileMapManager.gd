@@ -1768,31 +1768,6 @@ func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 
-func SetLandPoints(line: Line2D, a: Vector2, b: Vector2):
-	var _a = get_node("../TileMap").local_to_map(a)
-	var _b = get_node("../TileMap").local_to_map(b)		
-	
-	get_node("../Seeker").position = a
-	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
-	var tween: Tween = create_tween()
-	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
-	await get_tree().create_timer(1).timeout			
-
-	var explosion = preload("res://scenes/vfx/explosion.scn")
-	var explosion_instance = explosion.instantiate()
-	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
-	explosion_instance.set_name("explosion")
-	get_parent().add_child(explosion_instance)
-	explosion_instance.position = explosion_position	
-	explosion_instance.position.y -= 16
-	explosion_instance.z_index = (_b.x + _b.y) + 1
-
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
-
-	
 func _on_next_button_pressed():
 	get_tree().reload_current_scene()
 
