@@ -75,7 +75,7 @@ var laser_a = Vector2(0,0)
 var laser_b = Vector2(0,0)
 
 var swarm_turns = 0
-var before_swarm_total = 4
+var before_swarm_total = 3
 var swarming = false
 
 var random = []
@@ -1010,18 +1010,16 @@ func zombie_attack_ai(target_human: int, closest_zombie_to_human: Area2D):
 	check_humans_dead()	
 
 func zombie_attack_swarm():
-	var dead_humans = get_tree().get_nodes_in_group("humans dead")
+	dead_humans = get_tree().get_nodes_in_group("humans dead")
 	if dead_humans.size() == 1:
 		moving = false
 		swarming = false	
-		check_humans_dead()
-		return		
+		check_humans_dead()	
 			
 	zombies = get_tree().get_nodes_in_group("zombies")
 	if zombies.size() == 0:
 		moving = false
 		swarming = false		
-		return	
 
 	if index >= zombies.size():
 		index = 0
