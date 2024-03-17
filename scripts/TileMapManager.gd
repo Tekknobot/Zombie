@@ -88,7 +88,7 @@ func _ready():
 		zombies = get_tree().get_nodes_in_group("zombies")
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	astar_grid.size = Vector2i(16, 16)
 	astar_grid.cell_size = Vector2(1, 1)
 	astar_grid.default_compute_heuristic = 1
@@ -152,7 +152,7 @@ func _input(event):
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
 				var tile_pos = local_to_map(mouse_pos)	
-				var tile_data = get_cell_tile_data(0, tile_pos)
+				#var tile_data = get_cell_tile_data(0, tile_pos)
 
 				clicked_pos = tile_pos	
 				
@@ -217,7 +217,7 @@ func _input(event):
 						laser_a = Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16)
 						laser_b = Vector2(all_units[h].position.x,all_units[h].position.y-16)
 						 	
-						await SetLinePoints(line_2d, Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
+						await SetLinePoints(Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
 						all_units[h].get_child(0).set_offset(Vector2(0,0))
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
@@ -492,7 +492,7 @@ func _input(event):
 						var right_clicked_pos = local_to_map(right_clicked_unit.position)
 													
 						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_position.x:	
-							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							#var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -506,7 +506,7 @@ func _input(event):
 							left_clicked_unit.get_child(0).play("default")					
 							
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_position.x:								
-							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							#var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -520,7 +520,7 @@ func _input(event):
 							left_clicked_unit.get_child(0).play("default")	
 								
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_position.x:	
-							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
+							#var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2											
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -534,7 +534,7 @@ func _input(event):
 							left_clicked_unit.get_child(0).play("default")	
 													
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_position.x:
-							var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
+							#var tile_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
 							var landmine = preload("res://scenes/mines/landmine.scn")
 							var landmine_instance = landmine.instantiate()
 							var landmine_position = get_node("../TileMap").map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -869,10 +869,9 @@ func _on_zombie():
 	if humans.size() == 0:
 		return
 	var target_human = rng.randi_range(0,humans.size()-1)
-	var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
+	#var human_position = get_node("../TileMap").map_to_local(humans[target_human].tile_pos) + Vector2(0,0) / 2 
 	var closest_zombie_to_human = humans[target_human].get_closest_attack_zombies()
 	
-	var dead_humans = get_tree().get_nodes_in_group("humans dead")
 	if dead_humans.size() == 1:
 		moving = false
 		swarming = false	
@@ -1162,7 +1161,7 @@ func show_zombie_movement_range():
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
 	var tile_pos = local_to_map(mouse_pos)	
-	var tile_data = get_cell_tile_data(0, tile_pos)
+	#var tile_data = get_cell_tile_data(0, tile_pos)
 	zombies = get_tree().get_nodes_in_group("zombies")
 	
 	#Place hover tiles		
@@ -1315,7 +1314,7 @@ func show_humans_movement_range():
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
 	var tile_pos = local_to_map(mouse_pos)	
-	var tile_data = get_cell_tile_data(0, tile_pos)
+	#var tile_data = get_cell_tile_data(0, tile_pos)
 	humans = get_tree().get_nodes_in_group("humans")
 	
 	#Place hover tiles		
@@ -1470,7 +1469,7 @@ func show_rambo_attack_range():
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
 	var tile_pos = local_to_map(mouse_pos)	
-	var tile_data = get_cell_tile_data(0, tile_pos)
+	#var tile_data = get_cell_tile_data(0, tile_pos)
 	humans = get_tree().get_nodes_in_group("humans")
 	
 	#Place hover tiles		
@@ -1701,7 +1700,7 @@ func show_dog_movement_range():
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 8
 	var tile_pos = local_to_map(mouse_pos)	
-	var tile_data = get_cell_tile_data(0, tile_pos)
+	#var tile_data = get_cell_tile_data(0, tile_pos)
 	humans = get_tree().get_nodes_in_group("humans")
 	
 	#Place hover tiles		
@@ -1740,14 +1739,13 @@ func check_humans_dead():
 			
 	if dead_humans.size() == 1:
 		print("Zombies Win!")	
-
 		soundstream.stream = soundstream.map_sfx[9]
 		soundstream.play()		
 		musicstream.stop()	
 		await get_tree().create_timer(1).timeout
 		get_tree().reload_current_scene()
 		
-func SetLinePoints(line: Line2D, a: Vector2, b: Vector2):
+func SetLinePoints(a: Vector2, b: Vector2):
 	get_node("../Seeker").show()
 	var _a = get_node("../TileMap").local_to_map(a)
 	var _b = get_node("../TileMap").local_to_map(b)		

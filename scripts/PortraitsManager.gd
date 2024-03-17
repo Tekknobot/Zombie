@@ -17,7 +17,7 @@ func _ready():
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	pass
 
 func _input(event):			
@@ -28,7 +28,7 @@ func _input(event):
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				var tile_pos = Map.local_to_map(mouse_position)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2
+				#var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2
 				
 				for i in Map.all_units.size():				
 					if Map.all_units[i].unit_type == "Zombie" and Map.all_units[i].tile_pos == tile_pos:

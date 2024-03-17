@@ -10,7 +10,7 @@ var color : Color = Color.RED
 
 @onready var line_2d = $"../Line2D"
 
-var _point2 : Vector2
+#var _point2 : Vector2
 
 var explosion = preload("res://scenes/vfx/explosion.scn")
 var blood = preload("res://scenes/vfx/blood.scn")

@@ -63,7 +63,7 @@ func _ready():
 	pos = global_position;
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	#set pos to current position
 	pos = global_position;
 	if pos - old_pos:
@@ -86,7 +86,7 @@ func _process(delta):
 		
 	var mouse_pos = get_global_mouse_position()
 	mouse_pos.y += 16
-	var mouse_local_pos = get_node("../TileMap").local_to_map(mouse_pos)
+	#var mouse_local_pos = get_node("../TileMap").local_to_map(mouse_pos)
 	self.tile_pos = get_node("../TileMap").local_to_map(self.position)
 	
 	# Z index layering
@@ -113,8 +113,8 @@ func _process(delta):
 	
 	# Check if off map
 	for i in get_node("../TileMap").cpu_units.size():
-		var unit_center_position = get_node("../TileMap").cpu_units[i].position
-		var unit_position = get_node("../TileMap").local_to_map(unit_center_position)		
+		#var unit_center_position = get_node("../TileMap").cpu_units[i].position
+		#var unit_position = get_node("../TileMap").local_to_map(unit_center_position)		
 		if unit_pos.x < 0 or unit_pos.x > 15 or unit_pos.y < 0 or unit_pos.y > 15:
 			self.get_child(0).play("death")
 			await get_tree().create_timer(0.5).timeout	
@@ -196,8 +196,7 @@ func landmine_collisions():
 	var unit_center_pos = get_node("../TileMap").local_to_map(self.position)		
 	for i in get_node("../TileMap").all_landmines.size():		
 		var mine_pos = get_node("../TileMap").local_to_map(get_node("../TileMap").all_landmines[i].position)
-		if unit_center_pos == mine_pos and only_once == true:		
-			only_once == false		
+		if unit_center_pos == mine_pos and only_once == true:				
 			var explosion = preload("res://scenes/vfx/explosion.scn")
 			var explosion_instance = explosion.instantiate()
 			var explosion_position = get_node("../TileMap").map_to_local(mine_pos) + Vector2(0,0) / 2
@@ -213,7 +212,8 @@ func landmine_collisions():
 			self.get_child(0).play("death")	
 			get_node("../TileMap").landmines_total -= 1	
 			get_node("../TileMap").moving = false
-	
+			only_once == false
+			
 	get_node("../Arrow").hide()
 	get_node("../Arrow2").hide()
 
