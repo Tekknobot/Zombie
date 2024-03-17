@@ -178,8 +178,8 @@ func _input(event):
 				for i in node2D.structures.size():
 					var tile_center_pos = map_to_local(tile_pos) + Vector2(0,0) / 2
 					if node2D.structures[i].position == tile_center_pos:
-						return			
-											
+						return					
+																	
 				# Ranged Attack
 				for h in all_units.size():					
 					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
@@ -471,6 +471,10 @@ func _input(event):
 							
 					#Snake Place landmine
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Snake" and landmines_range == true:
+						for i in user_units.size():
+							if user_units[i].tile_pos == clicked_pos:
+								return
+						
 						var attack_center_position = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_position.x:
