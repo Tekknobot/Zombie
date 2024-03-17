@@ -169,6 +169,12 @@ func _input(event):
 				if get_append_only_once:
 					get_append_only_once = false
 					cpu_units.append_array(zombies)
+				
+				# Return if clicked on struture
+				for i in node2D.structures.size():
+					var tile_center_pos = map_to_local(tile_pos) + Vector2(0,0) / 2
+					if node2D.structures[i].position == tile_center_pos:
+						return			
 											
 				# Ranged Attack
 				for h in all_units.size():					
