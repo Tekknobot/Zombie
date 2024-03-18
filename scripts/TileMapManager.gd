@@ -26,6 +26,7 @@ var rng = RandomNumberGenerator.new()
 @onready var musicstream = $"../MapMusicStream"
 
 @onready var gameover_prompt = $"../Control/GAMEOVER"
+@onready var mapcleared_prompt = $"../Control/CLEARED"
 
 var projectile = preload("res://scenes/projectiles/projectile.scn")
 
@@ -289,7 +290,8 @@ func _input(event):
 							soundstream.play()		
 						
 						await get_tree().create_timer(1).timeout
-						_on_zombie()	
+						_on_zombie()
+						check_zombies_dead()	
 
 					#Dog Orbital laser
 					if clicked_center_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and right_clicked_unit.unit_name == "Robodog":
@@ -402,6 +404,7 @@ func _input(event):
 													
 						await get_tree().create_timer(1).timeout
 						_on_zombie()	
+						check_zombies_dead()
 					
 					#Dog Landmine run
 					if get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.unit_type == "Dog" and right_clicked_unit.unit_name == "Robodog" and user_units[selected_unit_num].unit_name != "Snake" and dogmine_range == true:
@@ -467,7 +470,8 @@ func _input(event):
 							user_units[selected_unit_num].kill_count = 2
 							user_units[selected_unit_num].get_child(0).play("default")
 								
-							_on_zombie()				
+							_on_zombie()	
+							check_zombies_dead()			
 							
 					#Snake Place landmine
 					if right_clicked_unit.position == all_units[h].position and get_cell_source_id(1, tile_pos) == 48 and right_clicked_unit.attacked == false and attack_range == false and right_clicked_unit.unit_name == "Snake" and landmines_range == true:
@@ -556,6 +560,7 @@ func _input(event):
 							left_clicked_unit.get_child(0).play("default")	
 						
 						_on_zombie()
+						check_zombies_dead()
 						landmines_total += 1								
 							
 					
@@ -698,10 +703,12 @@ func _input(event):
 									user_units[selected_unit_num].moved = true
 									user_units[selected_unit_num].kill_count += 1
 									check_humans_dead()	
-									_on_zombie()								
+									_on_zombie()
+									check_zombies_dead()								
 									return
 									
-					_on_zombie()						
+					_on_zombie()	
+					check_zombies_dead()					
 						
 				#Show movement range	
 				for i in all_units.size():				
@@ -1742,6 +1749,7 @@ func check_zombies_dead():
 		map_cleared = true	
 		next_button.show()
 		reset_button.hide()
+		mapcleared_prompt.show()
 		await get_tree().create_timer(0).timeout
 					
 func check_humans_dead():

@@ -16,8 +16,6 @@ var moves = {N: Vector2i(0, -1),
 @onready var Map = $TileMap
 @onready var SpawnManager = $SpawnManager
 
-@export var spawn_button : Button
-
 var building = preload("res://scenes/building.scn")
 var tower = preload("res://scenes/tower.scn")
 var stadium = preload("res://scenes/stadium.scn")
