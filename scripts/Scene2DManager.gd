@@ -67,6 +67,9 @@ var foundation_tile
 var tilelist = []
 var tile_random_id : int
 
+var tower_coord : Array[Vector2i]
+var tower_int = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():	
 	select_biome()	
@@ -419,20 +422,22 @@ func spawn_towers_final():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 43:	
-				var tile_pos = Vector2i(i, j)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-				var tower_inst = tower.instantiate()
-				tower_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)
-				var tween: Tween = create_tween()
-				tween.tween_property(tower_inst, "position", tile_center_pos, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)								
-				add_child(tower_inst)	
-				tower_inst.add_to_group("towers")	
-				tower_inst.z_index = tile_pos.x + tile_pos.y
-				tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
-				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
-				progresscount += 1
-				break		
+				tower_coord.append((Vector2i(i,j)))
 				
+	var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size())]
+	var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+	var tower_inst = tower.instantiate()
+	tower_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)
+	var tween: Tween = create_tween()
+	tween.tween_property(tower_inst, "position", tile_center_pos, 1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)								
+	add_child(tower_inst)	
+	tower_inst.add_to_group("towers")	
+	tower_inst.z_index = tile_pos.x + tile_pos.y
+	tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
+	Map.set_cell(0, tile_pos, 9, Vector2i(0, 0), 0)
+	progresscount += 1						
+	await get_tree().create_timer(0).timeout				
+								
 	towers = get_tree().get_nodes_in_group("towers")
 	structures.append_array(towers)
 	add_to_structures_array()
