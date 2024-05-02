@@ -424,7 +424,7 @@ func spawn_towers_final():
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 43:	
 				tower_coord.append((Vector2i(i,j)))
 				
-	var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size())]
+	var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 	var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 	var tower_inst = tower.instantiate()
 	tower_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)
